@@ -1,9 +1,12 @@
+import { supabase } from '../lib/supabase-client';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
+import '../global.css';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 
@@ -15,6 +18,8 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     if (loaded) {
@@ -28,10 +33,13 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <AuthProvider>
+        <Stack initialRouteName='(tabs)'>
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen name='login' />
+          <Stack.Screen name='+not-found' />
+        </Stack>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

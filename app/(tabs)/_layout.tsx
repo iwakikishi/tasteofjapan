@@ -15,21 +15,38 @@ export default function TabLayout() {
         headerShown: false,
       }}>
       <Tabs.Screen
-        name="index"
+        name='(tab1)'
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />
-          ),
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'home' : 'home-outline'} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name='(tab2)'
         options={{
           title: 'Explore',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'code-slash' : 'code-slash-outline'} color={color} />
-          ),
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name='(tab3)'
+        options={{
+          title: 'Game',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'game-controller' : 'game-controller-outline'} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name='(tab4)'
+        options={{
+          title: 'Stage',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name='(tab5)'
+        options={{
+          title: 'Orders',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'fast-food' : 'fast-food-outline'} color={color} />,
         }}
       />
     </Tabs>
