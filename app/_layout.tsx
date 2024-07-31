@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase-client';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { CartProvider } from '@/context/CartContext';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -33,13 +34,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AuthProvider>
-        <Stack initialRouteName='(tabs)'>
-          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-          <Stack.Screen name='login' />
-          <Stack.Screen name='+not-found' />
-        </Stack>
-      </AuthProvider>
+      <CartProvider>
+        <AuthProvider>
+          <Stack initialRouteName='(tabs)'>
+            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+            <Stack.Screen name='login' />
+            <Stack.Screen name='+not-found' />
+          </Stack>
+        </AuthProvider>
+      </CartProvider>
     </ThemeProvider>
   );
 }

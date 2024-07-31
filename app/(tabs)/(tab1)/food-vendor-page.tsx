@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { CartContext } from '@/context/CartContext';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Dimensions, Text, TouchableOpacity, View, ScrollView, Image } from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View, ScrollView, Image, Pressable } from 'react-native';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle } from 'react-native-reanimated';
 import { VendorCarousel } from '@/components/VendorCarousel';
 import { supabase } from '@/lib/supabase-client';
@@ -38,11 +39,12 @@ const times = [
 
 export default function FoodVendorPage() {
   const router = useRouter();
+  const { cart, setCart } = useContext(CartContext);
   const { user } = useAuth();
   const { vendor } = useLocalSearchParams();
 
   const [showPayment, setShowPayment] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(1);
+  const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTime, setSelectedTime] = useState('1100');
   const [menus, setMenus] = useState<Menu[]>([]);
   const vendorData: Vendor = JSON.parse(vendor as string);
@@ -57,27 +59,62 @@ export default function FoodVendorPage() {
       if (error) {
         console.log(error);
       } else {
-        setMenus(data ?? []);
+        let quantityAddedData = data.map((menu) => ({
+          ...menu,
+          quantity: 0,
+        }));
+        setMenus(quantityAddedData);
       }
     };
     fetchVendor();
   }, []);
 
-  const onPressBuy = () => {
-    console.log(user);
-    if (!user) {
-      router.push('/login');
-    } else {
-      setShowPayment(true);
-    }
-  };
-
-  const onPressDate = (date: number) => {
-    setSelectedDate(date);
+  const onPressMenu = (menu: Menu) => {
+    console.log(menu);
   };
 
   const onPressTime = (time: string) => {
     setSelectedTime(time);
+  };
+
+  const onPressAdd = (menu: Menu, index: number) => {
+    setMenus((prevMenus) => {
+      const newMenus = [...prevMenus];
+      newMenus[index].quantity = newMenus[index].quantity + 1;
+      return newMenus;
+    });
+    if (cart.find((item) => item.id === menu.id)) {
+      setCart((prevCart) => {
+        const existingItemIndex = prevCart.findIndex((item) => item.id === menu.id);
+        if (existingItemIndex !== -1) {
+          const updatedCart = [...prevCart];
+          updatedCart[existingItemIndex] = { ...updatedCart[existingItemIndex], quantity: updatedCart[existingItemIndex].quantity + 1 };
+          return updatedCart;
+        } else {
+          return [...prevCart, { ...menu, quantity: 1 }];
+        }
+      });
+    } else {
+      setCart([...cart, { ...menu, quantity: 1 }]);
+    }
+  };
+
+  const onPressRemove = (menu: Menu, index: number) => {
+    setMenus((prevMenus) => {
+      const newMenus = [...prevMenus];
+      newMenus[index].quantity = 0;
+      return newMenus;
+    });
+    setCart((prevCart) => prevCart.filter((item) => item.id !== menu.id));
+  };
+
+  const onPressCheckout = () => {
+    console.log(cart);
+    // if (!user) {
+    //   router.push('/login');
+    // } else {
+    //   setShowPayment(true);
+    // }
   };
 
   return (
@@ -96,27 +133,18 @@ export default function FoodVendorPage() {
           <Text className='text-white text-2xl font-bold'>Pickup Date</Text>
           <View className='flex-row w-full my-6 gap-4'>
             <SegmentedControl
-              values={['One', 'Two']}
+              values={['12/14', '12/15']}
               selectedIndex={selectedDate}
               onChange={(event) => {
                 setSelectedDate(event.nativeEvent.selectedSegmentIndex);
               }}
+              tintColor='red'
+              style={{ width: 200, height: 40 }}
+              fontStyle={{ fontSize: 18, fontWeight: 'bold' }}
+              activeFontStyle={{ fontSize: 18, fontWeight: '800' }}
             />
-            <TouchableOpacity
-              className={`px-4 py-2 rounded-md ${selectedDate === 1 ? 'bg-red-600' : 'bg-slate-900'}`}
-              onPress={() => onPressDate(1)}
-              activeOpacity={0.7}>
-              <Text className={`text-center text-xl font-bold text-white`}>12/14</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              className={`px-4 py-2 rounded-md ${selectedDate === 2 ? 'bg-red-600' : 'bg-slate-900'}`}
-              onPress={() => onPressDate(2)}
-              activeOpacity={0.7}>
-              <Text className={`text-center text-xl font-bold text-white`}>12/15</Text>
-            </TouchableOpacity>
           </View>
           <Text className='text-white text-2xl font-bold'>Pickup Time</Text>
-
           <ScrollView horizontal showsHorizontalScrollIndicator={false} className='flex my-6'>
             <View className='flex flex-row gap-4'>
               {times.map((time) => (
@@ -131,9 +159,11 @@ export default function FoodVendorPage() {
           </ScrollView>
         </View>
         <View className='flex flex-col px-4'>
+          <Text className='text-white text-2xl font-bold'>Menus</Text>
+
           {menus.length > 0 &&
-            menus.map((menu) => (
-              <View key={menu.id} className='flex flex-row justify-between items-center'>
+            menus.map((menu, index) => (
+              <Pressable key={menu.id} className='flex flex-row justify-between items-center' onPress={() => onPressMenu(menu)}>
                 <View className='flex gap-1 mr-4'>
                   <Text className='text-white text-2xl font-semibold'>{menu.name}</Text>
                   <Text className='text-white text-xl'>${parseFloat(menu.price.toFixed(2))}</Text>
@@ -141,15 +171,34 @@ export default function FoodVendorPage() {
                 </View>
                 <View className='w-1/3 relative'>
                   <Image source={{ uri: menu.images[0].uri }} className='w-full h-40 rounded-md' />
-                  <TouchableOpacity className='absolute bottom-1 right-1 w-10 h-10 bg-white rounded-full items-center justify-center'>
-                    <Ionicons name='add' color='black' size={24} />
-                  </TouchableOpacity>
+                  {menu.quantity === 0 ? (
+                    <TouchableOpacity
+                      className='absolute bottom-1 right-0 w-10 h-10 bg-white rounded-full items-center justify-center'
+                      onPress={() => onPressAdd(menu, index)}>
+                      <Ionicons name='add' color='black' size={24} />
+                    </TouchableOpacity>
+                  ) : (
+                    <View className='flex-row absolute bottom-1 right-0 rounded-full w-3/4 h-10 bg-white items-center justify-between px-3'>
+                      <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(menu, index)}>
+                        <Ionicons name='trash-bin' color='black' size={18} />
+                      </TouchableOpacity>
+                      <View className='items-center justify-center'>
+                        <Text className='text-black text-xl font-bold text-center'>{menu.quantity}</Text>
+                      </View>
+                      <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(menu, index)}>
+                        <Ionicons name='add' color='black' size={18} />
+                      </TouchableOpacity>
+                    </View>
+                  )}
                 </View>
-              </View>
+              </Pressable>
             ))}
         </View>
         <View className='flex p-10 justify-center items-center'>
-          <TouchableOpacity className='bg-red-600 p-4 rounded-md w-full' onPress={onPressBuy}>
+          <TouchableOpacity
+            className={`${cart.length > 0 ? 'bg-red-600 animate-fade-in' : 'hidden'} p-4 rounded-md w-full`}
+            disabled={cart.length === 0}
+            onPress={onPressCheckout}>
             <Text className='text-white text-center text-xl font-bold'>Checkout</Text>
           </TouchableOpacity>
         </View>

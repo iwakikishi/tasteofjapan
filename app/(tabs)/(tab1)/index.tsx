@@ -26,6 +26,13 @@ export default function HomeScreen() {
           Edit <ThemedText type='defaultSemiBold'>app/(tabs)/index.tsx</ThemedText> to see changes. Press{' '}
           <ThemedText type='defaultSemiBold'>{Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}</ThemedText> to open developer tools.
         </ThemedText> */}
+          <View className='flex my-8'>
+            <Link href='/ticket' asChild>
+              <TouchableOpacity className='h-12 bg-red-500 rounded-full items-center justify-center px-8'>
+                <Text className='font-bold text-white text-lg'>Buy ticket - $10</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </ThemedView>
 
         {/* Pre-order section */}
@@ -37,7 +44,7 @@ export default function HomeScreen() {
         {/* Goodie section */}
         <View className='flex mt-10'>
           <Image source={require('@/assets/images/goodie.jpg')} resizeMode='contain' className='w-full h-[500px]' />
-          <Link href='/descriptions' asChild>
+          <Link href='/goodie-bag' asChild>
             <TouchableOpacity className='w-full h-14 rounded-lg bg-blue-500 justify-center items-center'>
               <ThemedText type='defaultSemiBold'>Buy</ThemedText>
             </TouchableOpacity>
