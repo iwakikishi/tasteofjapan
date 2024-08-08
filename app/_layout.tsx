@@ -1,5 +1,4 @@
-import { supabase } from '../lib/supabase-client';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 import { CartProvider } from '@/context/CartContext';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -34,15 +33,24 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <CartProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <CartProvider>
           <Stack initialRouteName='(tabs)'>
             <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-            <Stack.Screen name='login' />
+            <Stack.Screen name='login' options={{ headerShown: true, headerTitle: 'Sign up', headerBackTitleVisible: false }} />
+            <Stack.Screen
+              name='register'
+              options={{ headerShown: true, headerTitle: 'Sign up', headerBackVisible: false, headerBackTitleVisible: false }}
+            />
+            <Stack.Screen name='login-callback' options={{ headerShown: true, headerTitle: 'Verification', headerBackTitleVisible: false }} />
+            <Stack.Screen
+              name='order-confirmation'
+              options={{ headerShown: true, headerTitle: 'Order Confirmation', headerBackTitleVisible: false }}
+            />
             <Stack.Screen name='+not-found' />
           </Stack>
-        </AuthProvider>
-      </CartProvider>
+        </CartProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

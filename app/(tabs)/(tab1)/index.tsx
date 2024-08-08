@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Platform, Text, Button, ScrollView, TouchableOpacity, View, SafeAreaView } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Switch } from 'react-native';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -6,26 +6,45 @@ import { ThemedView } from '@/components/ThemedView';
 import TitleComponent from '@/components/TitleComponent';
 import { Link } from 'expo-router';
 import FoodPreOrderHorizontalScrollView from '@/components/FoodPreOrderHorizontalScrollView';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import CountDown from '@/components/CountDown';
+
+const timeUntil = Math.floor((new Date('2024-12-14T16:00:00-08:00').getTime() - new Date().getTime()) / 1000);
 
 export default function HomeScreen() {
+  const { user } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(true);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#fff', dark: '#fff' }}
         headerImage={<Image source={require('@/assets/images/top.jpg')} style={styles.reactLogo} resizeMode='cover' />}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type='title'>Welcome!</ThemedText>
-          <HelloWave />
-        </ThemedView>
+        <View className='flex-row justify-between items-center mt-4'>
+          <View className='flex-row items-center'>
+            <ThemedText type='title'>Welcome {user ? user.firstName : ''}!</ThemedText>
+            <HelloWave />
+          </View>
+        </View>
         <ThemedView style={styles.stepContainer}>
+          <View className='flex my-7 self-start'>
+            <CountDown
+              size={24}
+              until={timeUntil}
+              onFinish={() => alert('Finished')}
+              digitStyle={{ backgroundColor: '#FFF', borderWidth: 2, borderColor: '#1CC625' }}
+              digitTxtStyle={{ color: '#1CC625' }}
+              timeLabelStyle={{ color: 'white', fontWeight: 'bold' }}
+              separatorStyle={{ color: '#1CC625' }}
+              timeToShow={['D', 'H', 'M', 'S']}
+              timeLabels={{ d: 'D', h: 'H', m: 'M', s: 'S' }}
+              // showSeparator
+            />
+          </View>
           <ThemedText type='subtitle'>December 14th</ThemedText>
           <ThemedText type='subtitle'>December 15th</ThemedText>
-          {/* How to use ThemedText */}
-          {/* <ThemedText type='subtitle'>Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type='defaultSemiBold'>app/(tabs)/index.tsx</ThemedText> to see changes. Press{' '}
-          <ThemedText type='defaultSemiBold'>{Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}</ThemedText> to open developer tools.
-        </ThemedText> */}
           <View className='flex my-8'>
             <Link href='/ticket' asChild>
               <TouchableOpacity className='h-12 bg-red-500 rounded-full items-center justify-center px-8'>
@@ -52,23 +71,37 @@ export default function HomeScreen() {
         </View>
 
         {/* Yokocho section */}
-        <ThemedView style={styles.stepContainer} className='mt-10'>
-          <ThemedView className='flex-row justify-between'>
-            <ThemedView className='w-1/2'>
+        <View className='mt-10 gap-4'>
+          <View className='flex-row justify-between'>
+            <View className='w-1/2'>
               <Image source={require('@/assets/images/yokocho_1.jpg')} resizeMode='contain' className='w-full h-[200px]' />
               <ThemedText type='subtitle' className='mt-2 text-center'>
                 Yokocho
               </ThemedText>
-            </ThemedView>
-            <ThemedView className='w-1/2'>
+            </View>
+            <View className='w-1/2'>
               <Image source={require('@/assets/images/yokocho_2.jpg')} resizeMode='contain' className='w-full h-[200px]' />
               <ThemedText type='subtitle' className='mt-2 text-center'>
                 Yokocho
               </ThemedText>
-            </ThemedView>
-          </ThemedView>
-        </ThemedView>
+            </View>
+          </View>
+        </View>
+
+        {/* admin switch */}
+        <View className='flex '>
+          <ThemedText type='subtitle'>Admin</ThemedText>
+          <Switch value={isAdmin} onValueChange={setIsAdmin} />
+        </View>
       </ParallaxScrollView>
+
+      <View className={`${isAdmin ? 'flex' : 'hidden'} absolute bottom-2 right-2`}>
+        <Link href='/qr-scan' asChild>
+          <TouchableOpacity className='bg-red-500 p-4 rounded-full'>
+            <Ionicons name='camera' size={24} color='white' />
+          </TouchableOpacity>
+        </Link>
+      </View>
     </SafeAreaView>
   );
 }

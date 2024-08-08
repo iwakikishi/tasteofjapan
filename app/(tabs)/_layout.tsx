@@ -24,8 +24,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name='(tab2)'
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />,
+          title: 'Orders',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'fast-food' : 'fast-food-outline'} color={color} />,
         }}
       />
       <Tabs.Screen
@@ -45,8 +45,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name='(tab5)'
         options={{
-          title: 'Orders',
-          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'fast-food' : 'fast-food-outline'} color={color} />,
+          title: 'Account',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'person' : 'person-outline'} color={color} />,
         }}
       />
     </Tabs>
