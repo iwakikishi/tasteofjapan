@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
-import { Dimensions, Image, Text, TouchableOpacity, View, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
+import { Dimensions, Text, TouchableOpacity, View, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
+import { Image } from 'expo-image';
 import Animated, { interpolate, interpolateColor, useAnimatedStyle } from 'react-native-reanimated';
 import { ProductCarousel } from '@/components/ProductCarousel';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -9,7 +10,7 @@ import { useTicketCart } from '@/context/CartContext';
 
 const ticketQty = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-const deviceWidth = Dimensions.get('window').width;
+const deviceWidth: number = Dimensions.get('window').width;
 
 export default function TicketScreen() {
   const { user } = useAuth();
@@ -24,17 +25,25 @@ export default function TicketScreen() {
   const PAGE_WIDTH = Dimensions.get('window').width;
 
   const onPressBuy = () => {
+    const updateTicketCart = (name: string, validDate: string, quantity: number) => {
+      const existingTicketIndex = ticketCart.findIndex((ticket) => ticket.name === name && ticket.valid_date === validDate);
+
+      if (existingTicketIndex !== -1) {
+        // 既存のチケットを更新
+        const updatedCart = [...ticketCart];
+        updatedCart[existingTicketIndex].qty += quantity;
+        setTicketCart(updatedCart);
+      } else {
+        // 新しいチケットを追加
+        setTicketCart([...ticketCart, { name, valid_date: validDate, qty: quantity, userId: user?.id, category: 'ADMISSION' }]);
+      }
+    };
+
     if (saturdayTicketQuantity > 0) {
-      setTicketCart([
-        ...ticketCart,
-        { name: '12/14 Saturday', valid_date: '12/14', qty: saturdayTicketQuantity, userId: user?.id, category: 'ADMISSION' },
-      ]);
+      updateTicketCart('12/14 Saturday', '12/14', saturdayTicketQuantity);
     }
     if (sundayTicketQuantity > 0) {
-      setTicketCart([
-        ...ticketCart,
-        { name: '12/15 Sunday', valid_date: '12/15', qty: sundayTicketQuantity, userId: user?.id, category: 'ADMISSION' },
-      ]);
+      updateTicketCart('12/15 Sunday', '12/15', sundayTicketQuantity);
     }
 
     if (!user?.id) {
@@ -86,121 +95,128 @@ export default function TicketScreen() {
   };
 
   return (
-    <ScrollView className='flex px-6' showsVerticalScrollIndicator={false}>
-      <View className='flex'>
-        <Image source={require('@/assets/images/top.jpg')} className='w-full h-[200px] aspect-auto' resizeMode='cover' />
+    <ScrollView className='flex' showsVerticalScrollIndicator={false}>
+      <View className='flex w-full'>
+        <Image
+          source={require('@/assets/images/comingsoon.jpg')}
+          style={{ width: deviceWidth, height: 'auto', aspectRatio: 1 }}
+          contentFit='contain'
+          transition={1000}
+        />
       </View>
       {/* ADMISSION FEE */}
-      <View className='flex py-4 bg-black'>
-        <View className='flex'>
-          <Text className='text-white font-bold text-xl'>12/14 SATURDAY</Text>
+      <View className='flex px-6'>
+        <View className='flex py-4 bg-black'>
+          <View className='flex'>
+            <Text className='text-white font-bold text-xl'>12/14 SATURDAY</Text>
+            <View className='flex-row border border-white rounded-lg p-4 items-center mt-3'>
+              <View className='flex-1'>
+                <Text className='text-white font-bold text-xl'>ADMISSION FEE</Text>
+                <Text className='text-white text-md'>$10 / per ticket</Text>
+              </View>
+              <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
+                <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(0)}>
+                  <Ionicons name='remove' color='black' size={18} />
+                </TouchableOpacity>
+                <View className='items-center justify-center'>
+                  <Text className='text-black text-xl font-bold text-center'>{saturdayTicketQuantity}</Text>
+                </View>
+                <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(0)}>
+                  <Ionicons name='add' color='black' size={18} />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View className='flex mt-8'>
+          <Text className='text-white font-bold text-xl'>12/15 SUNDAY</Text>
           <View className='flex-row border border-white rounded-lg p-4 items-center mt-3'>
             <View className='flex-1'>
               <Text className='text-white font-bold text-xl'>ADMISSION FEE</Text>
               <Text className='text-white text-md'>$10 / per ticket</Text>
             </View>
             <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
-              <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(0)}>
+              <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(1)}>
                 <Ionicons name='remove' color='black' size={18} />
               </TouchableOpacity>
               <View className='items-center justify-center'>
-                <Text className='text-black text-xl font-bold text-center'>{saturdayTicketQuantity}</Text>
+                <Text className='text-black text-xl font-bold text-center'>{sundayTicketQuantity}</Text>
               </View>
-              <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(0)}>
+              <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(1)}>
                 <Ionicons name='add' color='black' size={18} />
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      </View>
-
-      <View className='flex mt-8'>
-        <Text className='text-white font-bold text-xl'>12/15 SUNDAY</Text>
-        <View className='flex-row border border-white rounded-lg p-4 items-center mt-3'>
-          <View className='flex-1'>
-            <Text className='text-white font-bold text-xl'>ADMISSION FEE</Text>
-            <Text className='text-white text-md'>$10 / per ticket</Text>
-          </View>
-          <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
-            <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(1)}>
-              <Ionicons name='remove' color='black' size={18} />
-            </TouchableOpacity>
-            <View className='items-center justify-center'>
-              <Text className='text-black text-xl font-bold text-center'>{sundayTicketQuantity}</Text>
+        {/* BUNDLES */}
+        <View className={`${saturdayTicketQuantity > 0 || sundayTicketQuantity > 0 ? 'opacity-100' : 'opacity-50'} mt-12`}>
+          <View className='flex'>
+            <View className='flex-row items-center'>
+              <MaterialCommunityIcons name='vector-combine' size={24} color='white' className='mr-3' />
+              <Text className='text-white font-bold text-2xl'>Bundles</Text>
             </View>
-            <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(1)}>
-              <Ionicons name='add' color='black' size={18} />
-            </TouchableOpacity>
+            <Text className='text-white text-lg mt-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien.</Text>
           </View>
-        </View>
-      </View>
-      {/* BUNDLES */}
-      <View className={`${saturdayTicketQuantity > 0 || sundayTicketQuantity > 0 ? 'opacity-100' : 'opacity-50'} mt-12`}>
-        <View className='flex'>
-          <View className='flex-row items-center'>
-            <MaterialCommunityIcons name='vector-combine' size={24} color='white' className='mr-3' />
-            <Text className='text-white font-bold text-2xl'>Bundles</Text>
-          </View>
-          <Text className='text-white text-lg mt-2'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien.</Text>
-        </View>
-        {/* YOKOCHO TICKET */}
-        <View className='flex mt-12'>
-          <Text className='text-white font-bold text-2xl'>YOKOCHO TICKET</Text>
-          <Text className='text-white text-lg'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien.</Text>
+          {/* YOKOCHO TICKET */}
+          <View className='flex mt-12'>
+            <Text className='text-white font-bold text-2xl'>YOKOCHO TICKET</Text>
+            <Text className='text-white text-lg'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien.</Text>
 
-          <View className='flex-row justify-between gap-3 mt-8'>
-            <View className='w-1/2 items-center justify-center'>
-              <TouchableOpacity className='w-full' onPress={() => openModal(require('@/assets/images/yokocho_1.jpg'))}>
-                <Image source={require('@/assets/images/yokocho_1.jpg')} resizeMode='cover' className='w-full h-[200px]' />
-              </TouchableOpacity>
-              <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
-                <TouchableOpacity className='items-center justify-center' onPress={onPressSakeRemove}>
-                  <Ionicons name='remove' color='black' size={18} />
+            <View className='flex-row justify-between gap-3 mt-8'>
+              <View className='w-1/2 items-center justify-center'>
+                <TouchableOpacity className='w-full' onPress={() => openModal(require('@/assets/images/yokocho_1.jpg'))}>
+                  <Image source={require('@/assets/images/yokocho_1.jpg')} resizeMode='cover' className='w-full h-[200px]' />
                 </TouchableOpacity>
-                <View className='items-center justify-center'>
-                  <Text className='text-black text-xl font-bold text-center'>{sakeTicketQuantity}</Text>
+                <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
+                  <TouchableOpacity className='items-center justify-center' onPress={onPressSakeRemove}>
+                    <Ionicons name='remove' color='black' size={18} />
+                  </TouchableOpacity>
+                  <View className='items-center justify-center'>
+                    <Text className='text-black text-xl font-bold text-center'>{sakeTicketQuantity}</Text>
+                  </View>
+                  <TouchableOpacity className='items-center justify-center' onPress={onPressSakeAdd}>
+                    <Ionicons name='add' color='black' size={18} />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity className='items-center justify-center' onPress={onPressSakeAdd}>
-                  <Ionicons name='add' color='black' size={18} />
-                </TouchableOpacity>
               </View>
-            </View>
-            <View className='w-1/2 items-center justify-center'>
-              <TouchableOpacity className='w-full' onPress={() => openModal(require('@/assets/images/yokocho_2.jpg'))}>
-                <Image source={require('@/assets/images/yokocho_2.jpg')} resizeMode='cover' className='w-full h-[200px]' />
-              </TouchableOpacity>
-              <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
-                <TouchableOpacity className='items-center justify-center' onPress={onPressVipRemove}>
-                  <Ionicons name='remove' color='black' size={18} />
+              <View className='w-1/2 items-center justify-center'>
+                <TouchableOpacity className='w-full' onPress={() => openModal(require('@/assets/images/yokocho_2.jpg'))}>
+                  <Image source={require('@/assets/images/yokocho_2.jpg')} resizeMode='cover' className='w-full h-[200px]' />
                 </TouchableOpacity>
-                <View className='items-center justify-center'>
-                  <Text className='text-black text-xl font-bold text-center'>{vipTicketQuantity}</Text>
+                <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
+                  <TouchableOpacity className='items-center justify-center' onPress={onPressVipRemove}>
+                    <Ionicons name='remove' color='black' size={18} />
+                  </TouchableOpacity>
+                  <View className='items-center justify-center'>
+                    <Text className='text-black text-xl font-bold text-center'>{vipTicketQuantity}</Text>
+                  </View>
+                  <TouchableOpacity className='items-center justify-center' onPress={onPressVipAdd}>
+                    <Ionicons name='add' color='black' size={18} />
+                  </TouchableOpacity>
                 </View>
-                <TouchableOpacity className='items-center justify-center' onPress={onPressVipAdd}>
-                  <Ionicons name='add' color='black' size={18} />
-                </TouchableOpacity>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* Total section */}
-        <View className='flex-row justify-between items-center mt-12 border-b border-white pb-6'>
-          <Text className='text-white font-bold text-2xl'>Total</Text>
-          <Text className='text-white font-bold text-2xl'>
-            ${saturdayTicketQuantity * 10 + sundayTicketQuantity * 10 + sakeTicketQuantity * 10 + vipTicketQuantity * 10}
-          </Text>
-        </View>
+          {/* Total section */}
+          <View className='flex-row justify-between items-center mt-12 border-b border-white pb-6'>
+            <Text className='text-white font-bold text-2xl'>Total</Text>
+            <Text className='text-white font-bold text-2xl'>
+              ${saturdayTicketQuantity * 10 + sundayTicketQuantity * 10 + sakeTicketQuantity * 10 + vipTicketQuantity * 10}
+            </Text>
+          </View>
 
-        <TouchableOpacity
-          className={`mt-12 bg-red-600 p-4 rounded-md w-full ${
-            saturdayTicketQuantity > 0 || sundayTicketQuantity > 0 ? 'opacity-100' : 'opacity-50'
-          }`}
-          disabled={saturdayTicketQuantity > 0 || sundayTicketQuantity > 0 ? false : true}
-          onPress={onPressBuy}>
-          <Text className='text-white text-center text-xl font-bold'>Buy now</Text>
-        </TouchableOpacity>
-        <View className='h-12' />
+          <TouchableOpacity
+            className={`mt-12 bg-red-600 p-4 rounded-md w-full ${
+              saturdayTicketQuantity > 0 || sundayTicketQuantity > 0 ? 'opacity-100' : 'opacity-50'
+            }`}
+            disabled={saturdayTicketQuantity > 0 || sundayTicketQuantity > 0 ? false : true}
+            onPress={onPressBuy}>
+            <Text className='text-white text-center text-xl font-bold'>Buy now</Text>
+          </TouchableOpacity>
+          <View className='h-12' />
+        </View>
       </View>
       <Modal animationType='fade' transparent={true} visible={modalVisible} onRequestClose={closeModal}>
         <TouchableWithoutFeedback onPress={closeModal}>

@@ -9,6 +9,8 @@ export default function OrderConfirmationScreen() {
     setTicketCart(ticketCart.filter((_, i) => i !== index));
   };
 
+  const total = ticketCart.reduce((acc, item) => acc + item.qty * (item.category === 'ADMISSION' ? 10 : 10), 0);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View className='flex-1'>
@@ -32,10 +34,14 @@ export default function OrderConfirmationScreen() {
                 </View>
               </View>
             ))}
+            <View className='flex-row justify-between py-3'>
+              <Text className='text-lg font-bold text-white'>Total</Text>
+              <Text className='text-lg font-bold text-white'>${total}</Text>
+            </View>
           </View>
         </ScrollView>
         <View className={`w-full p-4 absolute bottom-5 left-0 bg-black ${ticketCart.length === 0 ? 'hidden' : ''}`}>
-          <TouchableOpacity className='w-full items-center justify-center bg-white p-4 rounded-full'>
+          <TouchableOpacity className='w-full items-center justify-center bg-white py-3 rounded-full'>
             <Text className='text-lg font-bold text-black'>Checkout</Text>
           </TouchableOpacity>
         </View>
