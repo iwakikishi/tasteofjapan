@@ -1,95 +1,87 @@
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { StyleSheet, Image, Platform } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, ActivityIndicator } from 'react-native';
+import { supabase } from '@/lib/supabase-client';
+import { useEffect, useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { Image } from 'expo-image';
+import { format, parseISO } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
-import { Collapsible } from '@/components/Collapsible';
-import { ExternalLink } from '@/components/ExternalLink';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+type Order = {
+  created_at: string;
+  id: string;
+  orders: any[];
+  pickup_date: string;
+  pickup_time: string;
+  user_id: string;
+};
 
 export default function OrdersScreen() {
+  const { user } = useAuth();
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setIsLoading(true);
+      console.log(user?.id);
+      const { data, error } = await supabase.from('orders').select('*').eq('user_id', user?.id).order('pickup_date', { ascending: true });
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(data);
+        setOrders(data);
+      }
+      setIsLoading(false);
+    };
+    fetchOrders();
+  }, []);
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={<Ionicons size={310} name='code-slash' style={styles.headerImage} />}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type='title'>Explore</ThemedText>
-      </ThemedView>
-      <ThemedText>This app includes example code to help you get started.</ThemedText>
-      <Collapsible title='File-based routing'>
-        <ThemedText>
-          This app has two screens: <ThemedText type='defaultSemiBold'>app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type='defaultSemiBold'>app/(tabs)/explore.tsx</ThemedText>
-        </ThemedText>
-        <ThemedText>
-          The layout file in <ThemedText type='defaultSemiBold'>app/(tabs)/_layout.tsx</ThemedText> sets up the tab navigator.
-        </ThemedText>
-        <ExternalLink href='https://docs.expo.dev/router/introduction'>
-          <ThemedText type='link'>Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title='Android, iOS, and web support'>
-        <ThemedText>
-          You can open this project on Android, iOS, and the web. To open the web version, press <ThemedText type='defaultSemiBold'>w</ThemedText> in
-          the terminal running this project.
-        </ThemedText>
-      </Collapsible>
-      <Collapsible title='Images'>
-        <ThemedText>
-          For static images, you can use the <ThemedText type='defaultSemiBold'>@2x</ThemedText> and{' '}
-          <ThemedText type='defaultSemiBold'>@3x</ThemedText> suffixes to provide files for different screen densities
-        </ThemedText>
-        <Image source={require('@/assets/images/react-logo.png')} style={{ alignSelf: 'center' }} />
-        <ExternalLink href='https://reactnative.dev/docs/images'>
-          <ThemedText type='link'>Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title='Custom fonts'>
-        <ThemedText>
-          Open <ThemedText type='defaultSemiBold'>app/_layout.tsx</ThemedText> to see how to load{' '}
-          <ThemedText style={{ fontFamily: 'SpaceMono' }}>custom fonts such as this one.</ThemedText>
-        </ThemedText>
-        <ExternalLink href='https://docs.expo.dev/versions/latest/sdk/font'>
-          <ThemedText type='link'>Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title='Light and dark mode components'>
-        <ThemedText>
-          This template has light and dark mode support. The <ThemedText type='defaultSemiBold'>useColorScheme()</ThemedText> hook lets you inspect
-          what the user's current color scheme is, and so you can adjust UI colors accordingly.
-        </ThemedText>
-        <ExternalLink href='https://docs.expo.dev/develop/user-interface/color-themes/'>
-          <ThemedText type='link'>Learn more</ThemedText>
-        </ExternalLink>
-      </Collapsible>
-      <Collapsible title='Animations'>
-        <ThemedText>
-          This template includes an example of an animated component. The <ThemedText type='defaultSemiBold'>components/HelloWave.tsx</ThemedText>{' '}
-          component uses the powerful <ThemedText type='defaultSemiBold'>react-native-reanimated</ThemedText> library to create a waving hand
-          animation.
-        </ThemedText>
-        {Platform.select({
-          ios: (
-            <ThemedText>
-              The <ThemedText type='defaultSemiBold'>components/ParallaxScrollView.tsx</ThemedText> component provides a parallax effect for the
-              header image.
-            </ThemedText>
-          ),
-        })}
-      </Collapsible>
-    </ParallaxScrollView>
+    <SafeAreaView className='flex-1'>
+      <ScrollView className='flex'>
+        <View className='flex p-4'>
+          <Text className='text-3xl font-bold text-white'>Orders</Text>
+          {isLoading ? (
+            <View className='flex-1 justify-center items-center h-full'>
+              <ActivityIndicator size='large' color='#ffffff' />
+            </View>
+          ) : orders.length === 0 ? (
+            <Text className='text-white text-lg mt-5'>オーダーがありません</Text>
+          ) : (
+            orders.map((item) => (
+              <View key={item.id} className='bg-gray-800 rounded-lg p-4 mt-5 shadow-md'>
+                <View className='flex flex-row justify-between items-center mb-2'>
+                  <Text className='text-lg font-semibold text-white'>Order #{item.id.slice(-4)}</Text>
+                  <Text className='text-sm text-gray-400'>
+                    {formatInTimeZone(parseISO(item.created_at), 'America/Los_Angeles', 'MMM d, yyyy h:mm a')}
+                  </Text>
+                </View>
+                <View className='flex flex-row justify-between mb-4'>
+                  <Text className='text-white'>Pickup Time:</Text>
+                  <Text className='text-white font-medium'>
+                    {formatInTimeZone(parseISO(`${item.pickup_date}T${item.pickup_time.split('+')[0]}`), 'America/Los_Angeles', 'MMM d, yyyy h:mm a')}
+                  </Text>
+                </View>
+                <View className='border-t border-gray-700 pt-4'>
+                  {item.orders.map((order, index) => (
+                    <View key={index} className='flex flex-row items-center mb-4'>
+                      <Image source={{ uri: order.image_uri }} style={{ width: 60, height: 60 }} className='rounded-md mr-4' />
+                      <View className='flex-1 ml-4'>
+                        <Text className='text-white font-semibold'>{order.menu_name}</Text>
+                        <Text className='text-gray-400'>{order.vendor_name}</Text>
+                        <View className='flex flex-row justify-between mt-1'>
+                          <Text className='text-white'>Quantity: {order.quantities}</Text>
+                          <Text className='text-white'>{order.status}</Text>
+                        </View>
+                      </View>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ))
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});

@@ -5,6 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
+    // "fonts": [
+    //   {
+    //     "asset": "assets/fonts/DMSans-VariableFont_opsz,wght.ttf",
+    //     "family": "DMSans"
+    //   },
+    //   {
+    //     "asset": "assets/fonts/DMSans-Italic-VariableFont_opsz,wght.ttf",
+    //     "family": "DMSans-Italic"
+    //   }
+    // ],
     "scheme": "tasteofjpn",
     "userInterfaceStyle": "automatic",
     "splash": {

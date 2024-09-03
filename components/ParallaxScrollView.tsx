@@ -1,5 +1,5 @@
 import { useEffect, type PropsWithChildren, type ReactElement } from 'react';
-import { StyleSheet, useColorScheme, View } from 'react-native';
+import { Dimensions, StyleSheet, useColorScheme, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -10,9 +10,10 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { ThemedView } from '@/components/ThemedView';
 
-const HEADER_HEIGHT = 600;
+const deviceWidth = Dimensions.get('window').width;
+
+const HEADER_HEIGHT = deviceWidth * 1.546;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    height: 500,
+    height: deviceWidth * 1.56,
     overflow: 'hidden',
   },
   content: {

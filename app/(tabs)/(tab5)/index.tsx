@@ -75,6 +75,7 @@ export default function AccountScreen() {
               </View>
             </View>
           </View>
+          {/* Link Section */}
           <View className='flex my-10 gap-4 px-2'>
             <Link href='/tickets'>
               <View className='flex-row w-full items-center justify-between py-4 border-b border-white'>
@@ -86,6 +87,27 @@ export default function AccountScreen() {
             <Link href='/profile' className='flex'>
               <View className='flex-row w-full items-center justify-between py-4 border-b border-white'>
                 <Text className='text-white text-lg font-semibold'>Edit Profile</Text>
+                <Ionicons name='chevron-forward' size={20} color='white' />
+              </View>
+            </Link>
+
+            <Link href='/about' className='flex'>
+              <View className='flex-row w-full items-center justify-between py-4 border-b border-white'>
+                <Text className='text-white text-lg font-semibold'>About us</Text>
+                <Ionicons name='chevron-forward' size={20} color='white' />
+              </View>
+            </Link>
+
+            <Link href='/yokocho' className='flex'>
+              <View className='flex-row w-full items-center justify-between py-4 border-b border-white'>
+                <Text className='text-white text-lg font-semibold'>Yokocho Fes</Text>
+                <Ionicons name='chevron-forward' size={20} color='white' />
+              </View>
+            </Link>
+
+            <Link href='/contact' className='flex'>
+              <View className='flex-row w-full items-center justify-between py-4 border-b border-white'>
+                <Text className='text-white text-lg font-semibold'>Contact</Text>
                 <Ionicons name='chevron-forward' size={20} color='white' />
               </View>
             </Link>

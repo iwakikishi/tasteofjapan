@@ -98,7 +98,7 @@ export default function TicketScreen() {
     <ScrollView className='flex' showsVerticalScrollIndicator={false}>
       <View className='flex w-full'>
         <Image
-          source={require('@/assets/images/comingsoon.jpg')}
+          source={'https://cdn.shopify.com/s/files/1/0663/3209/8735/files/tixx_74d625df-efe0-4faf-bac0-c0b055cbaaf2.jpg?v=1725003897'}
           style={{ width: deviceWidth, height: 'auto', aspectRatio: 1 }}
           contentFit='contain'
           transition={1000}
@@ -161,12 +161,12 @@ export default function TicketScreen() {
           {/* YOKOCHO TICKET */}
           <View className='flex mt-12'>
             <Text className='text-white font-bold text-2xl'>YOKOCHO TICKET</Text>
-            <Text className='text-white text-lg'>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed ut purus eget sapien.</Text>
+            <Text className='text-white text-lg'>Japanese craft beer & sake, shochu</Text>
 
             <View className='flex-row justify-between gap-3 mt-8'>
               <View className='w-1/2 items-center justify-center'>
                 <TouchableOpacity className='w-full' onPress={() => openModal(require('@/assets/images/yokocho_1.jpg'))}>
-                  <Image source={require('@/assets/images/yokocho_1.jpg')} resizeMode='cover' className='w-full h-[200px]' />
+                  <Image source={require('@/assets/images/yokocho_1.jpg')} contentFit='cover' style={{ width: '100%', height: 200 }} />
                 </TouchableOpacity>
                 <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
                   <TouchableOpacity className='items-center justify-center' onPress={onPressSakeRemove}>
@@ -182,7 +182,7 @@ export default function TicketScreen() {
               </View>
               <View className='w-1/2 items-center justify-center'>
                 <TouchableOpacity className='w-full' onPress={() => openModal(require('@/assets/images/yokocho_2.jpg'))}>
-                  <Image source={require('@/assets/images/yokocho_2.jpg')} resizeMode='cover' className='w-full h-[200px]' />
+                  <Image source={require('@/assets/images/yokocho_2.jpg')} contentFit='cover' style={{ width: '100%', height: 200 }} />
                 </TouchableOpacity>
                 <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
                   <TouchableOpacity className='items-center justify-center' onPress={onPressVipRemove}>
@@ -221,7 +221,7 @@ export default function TicketScreen() {
       <Modal animationType='fade' transparent={true} visible={modalVisible} onRequestClose={closeModal}>
         <TouchableWithoutFeedback onPress={closeModal}>
           <View className='flex-1 bg-black bg-opacity-90 justify-center items-center'>
-            <Image source={selectedImage} resizeMode='contain' className='w-full h-3/4' />
+            <Image source={selectedImage} contentFit='contain' style={{ width: '100%', height: '100%' }} />
           </View>
         </TouchableWithoutFeedback>
       </Modal>

@@ -1,4 +1,5 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Switch } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, SafeAreaView, Switch, Pressable } from 'react-native';
+import { Image } from 'expo-image';
 import { HelloWave } from '@/components/HelloWave';
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
@@ -19,77 +20,110 @@ export default function HomeScreen() {
   const { foodCart } = useFoodCart();
   const { ticketCart } = useTicketCart();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isHomePressed, setIsHomePressed] = useState(false);
+  const [isYokochoPressed, setIsYokochoPressed] = useState(false);
 
   return (
     <SafeAreaView className='flex-1'>
       <ParallaxScrollView
         headerBackgroundColor={{ light: '#fff', dark: '#fff' }}
-        headerImage={<Image source={require('@/assets/images/top.jpg')} style={styles.reactLogo} resizeMode='cover' />}>
-        <View className='flex bg-black p-4'>
-          <View className='flex-row justify-between items-center mt-4'>
-            <View className='flex-row items-center'>
-              <Text className='text-white text-3xl font-bold'>Welcome {user ? user.firstName : ''}!</Text>
-              <HelloWave />
+        headerImage={<Image source={require('@/assets/images/toj_image_540.jpeg')} style={styles.reactLogo} contentFit='cover' />}>
+        <View className='flex bg-black'>
+          {/* Welcome section */}
+          <View className='flex bg-red-600 p-4'>
+            <View className='flex-row justify-between items-center mt-4'>
+              <View className='flex-row items-center'>
+                <Text className='text-white text-3xl font-bold font-DMSans'>Welcome {user ? user.firstName : ''}!</Text>
+                <HelloWave />
+              </View>
             </View>
-          </View>
-          <View className='flex'>
-            <View className='flex my-7 self-start'>
-              <CountDown
-                size={24}
-                until={timeUntil}
-                onFinish={() => alert('Finished')}
-                digitStyle={{ backgroundColor: '#FFF', borderWidth: 2, borderColor: '#1CC625' }}
-                digitTxtStyle={{ color: '#1CC625' }}
-                timeLabelStyle={{ color: 'white', fontWeight: 'bold' }}
-                separatorStyle={{ color: '#1CC625' }}
-                timeToShow={['D', 'H', 'M', 'S']}
-                timeLabels={{ d: 'D', h: 'H', m: 'M', s: 'S' }}
-                // showSeparator
-              />
+            <View className='flex gap-3 mt-4'>
+              <Text className='text-white text-2xl font-bold' style={{ fontWeight: 'bold' }}>
+                Dec. 14th (12pm - 9pm)
+              </Text>
+              <Text className='text-white text-2xl font-DMSans font-bold' style={{ fontWeight: 'bold' }}>
+                Dec. 15th (12pm - 7pm)
+              </Text>
+              <View className='flex my-7 self-start'>
+                <CountDown
+                  size={24}
+                  until={timeUntil}
+                  onFinish={() => alert('Finished')}
+                  digitStyle={{ backgroundColor: 'transparent', borderWidth: 2, borderColor: 'grey' }}
+                  digitTxtStyle={{ color: '#1CC625' }}
+                  timeLabelStyle={{ color: 'white', fontWeight: 'bold' }}
+                  separatorStyle={{ color: 'grey' }}
+                  timeToShow={['D', 'H', 'M', 'S']}
+                  timeLabels={{ d: 'D', h: 'H', m: 'M', s: 'S' }}
+                  // showSeparator
+                />
+              </View>
+              <Text className='text-white text-xl font-bold'>HERITAGE SQUARE IN DOWNTOWN PHOENIX</Text>
+              <Text className='text-white text-xl font-bold'>113 N 6th St. Phoenix, AZ 85004 </Text>
+              <Pressable onPress={() => setIsHomePressed(!isHomePressed)}>
+                <Text className={`text-white text-md  ${!isHomePressed && 'line-clamp-3'}`}>
+                  Taste of Japan is thrilled to announce its return to Arizona for its second year! Following the success of our previous event in
+                  Southern California, which attracted over 75,000 enthusiastic attendees, we are excited to bring this unique experience back to
+                  Arizona once more! This year’s festivities will be bigger and better than ever, featuring an array of authentic Japanese foods, pop
+                  culture experiences, live entertainment, merchandise, fun activities, and so much more! Whether you’re a family looking for a fun
+                  day out, a food influencer eager to discover new culinary delights, or simply someone who loves Japanese culture, Taste of Japan has
+                  something for everyone.
+                </Text>
+              </Pressable>
             </View>
-            <Text className='text-white text-xl font-bold'>December 14th</Text>
-            <Text className='text-white text-xl font-bold'>December 15th</Text>
             <View className='flex my-8'>
               <Link href='/ticket' asChild>
-                <TouchableOpacity className='h-12 bg-red-500 rounded-full items-center justify-center self-start px-8'>
-                  <Text className='font-bold text-white text-lg'>Buy ticket - $10</Text>
+                <TouchableOpacity className='h-12 bg-white rounded-full items-center justify-center px-8'>
+                  <Text className='font-bold text-black text-lg'>Buy EARLY BIRD ticket - $10</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
+          </View>
+
+          {/* Yokocho section */}
+          <View className='mt-10 gap-4 p-4 rounded-md'>
+            <View className='flex w-full'>
+              <Image
+                source={'https://cdn.shopify.com/s/files/1/0663/3209/8735/files/welcometoyokocho.jpg?v=1724822477'}
+                contentFit='contain'
+                style={{ width: '100%', height: 200 }}
+              />
+            </View>
+            <Pressable onPress={() => setIsYokochoPressed(!isYokochoPressed)}>
+              <Text className={`text-white text-xl ${!isYokochoPressed && 'line-clamp-3'}`}>
+                Yokocho means “alleyway” in Japanese. This special feature invites attendees to indulge in a full sake experience while learning about
+                Japan’s local drinking culture. Walk-ins are welcome, but for those seeking an enhanced experience, our “Special Tasting tickets”
+                offer Japanese Sake or Japanese Beer tasting and Tuna sashimi sampler!
+              </Text>
+            </Pressable>
+            <View className='flex-row w-full'>
+              <Link href='/ticket' asChild>
+                <TouchableOpacity className='w-1/2 h-14 rounded-lg bg-red-500 justify-center items-center'>
+                  <Text className='text-white text-xl'>Buy Tickets</Text>
+                </TouchableOpacity>
+              </Link>
+              <Link href='/yokocho' asChild>
+                <TouchableOpacity className='w-1/2 h-14 justify-center items-center'>
+                  <Text className='text-white text-xl'>Learn more</Text>
                 </TouchableOpacity>
               </Link>
             </View>
           </View>
 
           {/* Pre-order section */}
-          <View className='flex mt-10'>
+          <View className='flex p-4 mt-10'>
             <TitleComponent title='Food Pre-order' category='Food' />
             <FoodPreOrderHorizontalScrollView />
           </View>
 
           {/* Goodie section */}
           <View className='flex mt-10'>
-            <Image source={require('@/assets/images/goodie.jpg')} resizeMode='contain' className='w-full h-[500px]' />
+            <Image source={require('@/assets/images/goodie.jpg')} contentFit='contain' className='w-full h-[500px]' />
             <Link href='/goodie-bag' asChild>
               <TouchableOpacity className='w-full h-14 rounded-lg bg-blue-500 justify-center items-center'>
                 <ThemedText type='defaultSemiBold'>Buy</ThemedText>
               </TouchableOpacity>
             </Link>
-          </View>
-
-          {/* Yokocho section */}
-          <View className='mt-10 gap-4'>
-            <View className='flex-row justify-between'>
-              <View className='w-1/2'>
-                <Image source={require('@/assets/images/yokocho_1.jpg')} resizeMode='contain' className='w-full h-[200px]' />
-                <ThemedText type='subtitle' className='mt-2 text-center'>
-                  Yokocho
-                </ThemedText>
-              </View>
-              <View className='w-1/2'>
-                <Image source={require('@/assets/images/yokocho_2.jpg')} resizeMode='contain' className='w-full h-[200px]' />
-                <ThemedText type='subtitle' className='mt-2 text-center'>
-                  Yokocho
-                </ThemedText>
-              </View>
-            </View>
           </View>
 
           {/* admin switch */}
@@ -131,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   reactLogo: {
-    height: 500,
+    height: '100%',
     width: '100%',
     bottom: 0,
     left: 0,

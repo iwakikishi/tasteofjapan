@@ -31,15 +31,15 @@ export default function TabLayout() {
       <Tabs.Screen
         name='(tab3)'
         options={{
-          title: 'Game',
-          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'game-controller' : 'game-controller-outline'} color={color} />,
+          title: 'Stage',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} />,
         }}
       />
       <Tabs.Screen
         name='(tab4)'
         options={{
-          title: 'Stage',
-          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} />,
+          title: 'Search',
+          tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />,
         }}
       />
       <Tabs.Screen
