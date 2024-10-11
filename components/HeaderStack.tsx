@@ -73,7 +73,10 @@ const HeaderStack = () => {
       <Stack.Screen
         name='product-detail'
         options={{
-          headerStyle: { backgroundColor: 'transparent' },
+          headerTransparent: true,
+          headerStyle: {
+            backgroundColor: 'transparent',
+          },
           headerTintColor: colors.headerText,
           headerTitle: () => <HeaderTitle title='' />,
           headerBackVisible: false,
@@ -81,6 +84,10 @@ const HeaderStack = () => {
           headerRight: () => <HeaderRight />,
           headerLeft: () => <HeaderLeft />,
           presentation: 'modal',
+          // // Androidのステータスバーの色を設定
+          // statusBarTranslucent: true,
+          // statusBarStyle: 'light',
+          // statusBarColor: 'transparent',
         }}
       />
 

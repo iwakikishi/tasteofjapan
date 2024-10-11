@@ -107,6 +107,53 @@ export const GET_COLLECTION_BY_ID = gql`
   }
 `;
 
+export const GET_COLLECTIONS = gql`
+  query GetCollections($collectionIds: [ID!]!) {
+    collections: nodes(ids: $collectionIds) {
+      ... on Collection {
+        id
+        handle
+        products(first: 100) {
+          edges {
+            node {
+              id
+              title
+              description
+              images(first: 1) {
+                edges {
+                  node {
+                    url
+                    altText
+                  }
+                }
+              }
+              priceRange {
+                minVariantPrice {
+                  amount
+                  currencyCode
+                }
+              }
+              variants(first: 100) {
+                edges {
+                  node {
+                    id
+                    title
+                    price {
+                      amount
+                      currencyCode
+                    }
+                    quantityAvailable
+                  }
+                }
+              }   
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_PRODUCT_AND_COLLECTIONS = gql`
   query GetProductAndCollections($productId: ID!, $collectionIds: [ID!]!) {
     product(id: $productId) {

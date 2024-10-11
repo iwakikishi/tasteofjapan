@@ -28,7 +28,7 @@ interface ProductEdge {
   node: Product;
 }
 
-export default function PreOrderHorizontalScrollView({ category }: { category: string }) {
+export default function PreOrderHorizontalScrollView({ category, color, pl }: { category: string; color: string; pl: number }) {
   const router = useRouter();
   const [data, setData] = useState<ProductEdge[]>([]);
 
@@ -65,18 +65,18 @@ export default function PreOrderHorizontalScrollView({ category }: { category: s
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} className='flex mt-5'>
       {data?.map((product) => (
-        <TouchableOpacity key={product.node.id} className='w-[70vw] h-auto rounded-xl overflow-hidden pl-4' onPress={() => onPressProduct(product)}>
+        <TouchableOpacity key={product.node.id} className='w-[240px] h-auto rounded-xl overflow-hidden pl-4' onPress={() => onPressProduct(product)}>
           {product.node.images && product.node.images.edges[0] && (
             <View className='flex w-full relative'>
-              <Image source={product.node.images.edges[0].node.url} contentFit='cover' style={{ width: '100%', height: 180, borderRadius: 10 }} />
+              <Image source={product.node.images.edges[0].node.url} contentFit='cover' style={{ width: '100%', height: 150, borderRadius: 10 }} />
               <View className='absolute top-0 right-0 bg-red-500 px-4 py-1 rounded-bl-lg'>
                 <Text className='text-white font-NotoSansBold text-md'>1000 pts</Text>
               </View>
             </View>
           )}
           <View className='flex mt-2 gap-1'>
-            <Text className='text-white text-lg font-NotoSansBold'>{product.node.title}</Text>
-            <ReadMore numberOfLines={2} style={{ color: 'white', fontFamily: 'NotoSans', fontSize: 13 }}>
+            <Text className={`text-${color ? 'black' : 'white'} text-lg font-NotoSansBold`}>{product.node.title}</Text>
+            <ReadMore numberOfLines={2} style={{ color: color ? 'black' : 'white', fontFamily: 'NotoSans', fontSize: 13 }}>
               {product.node.description}
             </ReadMore>
           </View>

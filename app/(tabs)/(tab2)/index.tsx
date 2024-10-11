@@ -184,12 +184,12 @@ export default function SearchScreen() {
 
   const TopButtons = () => {
     return (
-      <View className='flex-row w-full h-[60px] justify-center items-center'>
+      <View className='flex-row w-full h-[60px] items-center px-4'>
         <TouchableHighlight className={`rounded-full px-6 py-1 ${selectedTab === 0 ? 'bg-red-600' : 'bg-gray-800'}`} onPress={() => onPressTab(0)}>
           <Text className={`text-white text-lg ${selectedTab === 0 ? 'font-NotoSansBold' : 'font-NotoSans'}`}>Stage</Text>
         </TouchableHighlight>
         <TouchableHighlight
-          className={`mx-3 rounded-full px-6 py-1 ${selectedTab === 1 ? 'bg-red-600' : 'bg-gray-800'}`}
+          className={`mx-2 rounded-full px-6 py-1 ${selectedTab === 1 ? 'bg-red-600' : 'bg-gray-800'}`}
           onPress={() => onPressTab(1)}>
           <Text className={`text-white text-lg ${selectedTab === 1 ? 'font-NotoSansBold' : 'font-NotoSans'}`}>Food</Text>
         </TouchableHighlight>

@@ -1,14 +1,27 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'expo-router';
-import { Alert, Dimensions, Text, TouchableOpacity, View, ScrollView, Modal, TouchableWithoutFeedback, ActivityIndicator } from 'react-native';
+import {
+  Alert,
+  Dimensions,
+  Text,
+  TouchableOpacity,
+  View,
+  ScrollView,
+  Modal,
+  TouchableWithoutFeedback,
+  ActivityIndicator,
+  SafeAreaView,
+} from 'react-native';
+import { useTheme } from '@/context/ThemeContext';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import Client from 'shopify-buy';
 import { useQuery } from '@apollo/client';
 import { useCart } from '@/context/CartContext';
+
 import { GET_PRODUCT_AND_COLLECTIONS } from '@/graphql/queries';
-import { supabase } from '@/lib/supabase-client';
+import PreOrderHorizontalScrollView from '@/components/PreOrderHorizontalScrollView';
 
 // インターフェースの定義は変更なし
 interface Variant {
@@ -73,6 +86,7 @@ const deviceWidth: number = Dimensions.get('window').width;
 export default function TicketScreen() {
   const { user } = useAuth();
   const { setCart, tempCart, setTempCart } = useCart();
+  const { colors } = useTheme();
   const router = useRouter();
   const [showLoading, setShowLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -291,77 +305,83 @@ export default function TicketScreen() {
   };
 
   return (
-    <ScrollView ref={scrollViewRef} className='flex' showsVerticalScrollIndicator={false} style={{ backgroundColor: '#fff1ec' }}>
-      <View className='flex-1 w-full bg-white'>
-        <Image
-          source={'https://cdn.shopify.com/s/files/1/0663/3209/8735/files/tixx_74d625df-efe0-4faf-bac0-c0b055cbaaf2.jpg?v=1725003897'}
-          style={{ width: deviceWidth, height: 'auto', aspectRatio: 3 / 2 }}
-          contentFit='contain'
-          transition={1000}
-        />
-      </View>
-      {/* ADMISSION FEE */}
-      <View className='flex p-6'>
-        <Text className='text-md font-NotoSans'>
-          1-Day Ticket Admission for Taste of Japan.&nbsp; *Valid for only ONE of the two days (Dec. 14 OR Dec. 15). *PURCHASE EARLY BIRD TICKETS and
-          GET 1 SPIN on the Garapon! "Garapon" is a traditional Japanese wheel of fortune. Spin the garapon and win special prizes!
-        </Text>
-        <View className='flex py-6'>
-          <View className='flex'>
-            <View className='flex py-6'>
-              <View className='flex'>
-                <Text className='text-slate-700 font-bold text-xl'>12/14 SATURDAY</Text>
-                <View className='flex-row border border-slate-700 rounded-lg p-4 items-center mt-3'>
-                  <View className='flex-1'>
-                    <Text className='text-slate-700 font-bold text-xl'>ADMISSION FEE</Text>
-                    <Text className='text-slate-700 text-md'>$10 / per ticket</Text>
-                  </View>
-                  <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
-                    <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(0)}>
-                      <Ionicons name='remove' color='black' size={18} />
-                    </TouchableOpacity>
-                    <View className='items-center justify-center'>
-                      <Text className='text-black text-xl font-bold text-center'>{saturdayTicketQuantity}</Text>
-                    </View>
-                    <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(0)}>
-                      <Ionicons name='add' color='black' size={18} />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-            </View>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <View className='flex-1 relative'>
+        <ScrollView ref={scrollViewRef} className='flex' showsVerticalScrollIndicator={false} style={{ backgroundColor: '#fff1ec' }}>
+          <View className='flex-1 w-full bg-white'>
+            <Image
+              source={'https://cdn.shopify.com/s/files/1/0663/3209/8735/files/tixx_74d625df-efe0-4faf-bac0-c0b055cbaaf2.jpg?v=1725003897'}
+              style={{ width: deviceWidth, height: 'auto', aspectRatio: 3 / 2 }}
+              contentFit='contain'
+              transition={1000}
+            />
+          </View>
 
-            {/* 12/15 SUNDAY */}
-            <View className='flex mt-4'>
-              <Text className='text-slate-700 font-bold text-xl'>12/15 SUNDAY</Text>
-              <View className='flex-row border border-slate-700 rounded-lg p-4 items-center mt-3'>
-                <View className='flex-1'>
-                  <Text className='text-slate-700 font-bold text-xl'>ADMISSION FEE</Text>
-                  <Text className='text-slate-700 text-md'>$10 / per ticket</Text>
-                </View>
-                <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
-                  <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(1)}>
-                    <Ionicons name='remove' color='black' size={18} />
-                  </TouchableOpacity>
-                  <View className='items-center justify-center'>
-                    <Text className='text-black text-xl font-bold text-center'>{sundayTicketQuantity}</Text>
+          {/* ADMISSION FEE */}
+          <View className='flex p-6'>
+            <View className='flex'>
+              <Text className='text-md font-NotoSans'>
+                1-Day Ticket Admission for Taste of Japan.&nbsp; *Valid for only ONE of the two days (Dec. 14 OR Dec. 15). *PURCHASE EARLY BIRD
+                TICKETS and GET 1 SPIN on the Garapon! "Garapon" is a traditional Japanese wheel of fortune. Spin the garapon and win special prizes!
+              </Text>
+            </View>
+            <View className='flex '>
+              <View className='flex'>
+                <View className='flex py-6'>
+                  <View className='flex'>
+                    <Text className='text-slate-700 font-bold text-xl'>12/14 SATURDAY</Text>
+                    <View className='flex-row border border-slate-700 rounded-lg p-4 items-center mt-3'>
+                      <View className='flex-1'>
+                        <Text className='text-slate-700 font-bold text-xl'>ADMISSION FEE</Text>
+                        <Text className='text-slate-700 text-md'>$10 / per ticket</Text>
+                      </View>
+                      <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
+                        <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(0)}>
+                          <Ionicons name='remove' color='black' size={18} />
+                        </TouchableOpacity>
+                        <View className='items-center justify-center'>
+                          <Text className='text-black text-xl font-bold text-center'>{saturdayTicketQuantity}</Text>
+                        </View>
+                        <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(0)}>
+                          <Ionicons name='add' color='black' size={18} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
                   </View>
-                  <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(1)}>
-                    <Ionicons name='add' color='black' size={18} />
-                  </TouchableOpacity>
+                </View>
+
+                {/* 12/15 SUNDAY */}
+                <View className='flex mt-4'>
+                  <Text className='text-slate-700 font-bold text-xl'>12/15 SUNDAY</Text>
+                  <View className='flex-row border border-slate-700 rounded-lg p-4 items-center mt-3'>
+                    <View className='flex-1'>
+                      <Text className='text-slate-700 font-bold text-xl'>ADMISSION FEE</Text>
+                      <Text className='text-slate-700 text-md'>$10 / per ticket</Text>
+                    </View>
+                    <View className='flex-row rounded-full w-1/3 h-10 bg-white items-center justify-between px-3'>
+                      <TouchableOpacity className='items-center justify-center' onPress={() => onPressRemove(1)}>
+                        <Ionicons name='remove' color='black' size={18} />
+                      </TouchableOpacity>
+                      <View className='items-center justify-center'>
+                        <Text className='text-black text-xl font-bold text-center'>{sundayTicketQuantity}</Text>
+                      </View>
+                      <TouchableOpacity className='items-center justify-center' onPress={() => onPressAdd(1)}>
+                        <Ionicons name='add' color='black' size={18} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
                 </View>
               </View>
             </View>
           </View>
-        </View>
 
-        {/* BUNDLES */}
-        <View className={`${isAdmissionTicketInCart || user?.hasTickets ? 'opacity-100' : 'opacity-50'} mt-6`}>
-          {/* YOKOCHO TICKET */}
-          <View className='flex mt-6'>
+          {/* BUNDLES */}
+          <View className={`${isAdmissionTicketInCart || user?.hasTickets ? 'opacity-100' : 'opacity-50'} mt-6 gap-12`}>
+            {/* YOKOCHO TICKET */}
+            {/* <View className='flex p-6'>
             <Text className='text-slate-700 font-NotoSansBold text-2xl'>YOKOCHO TICKET</Text>
-            <Text className='text-slate-700 font-NotoSans text-lg mt-2'>Japanese craft beer & sake, shochu</Text>
-            <View className='flex-row justify-between gap-3 mt-8'>
+            <Text className='text-slate-700 font-NotoSans text-md mt-1'>Japanese craft beer & sake, shochu</Text>
+            <View className='flex-row justify-between gap-3 mt-4'>
               {yokochoTickets?.map((product: any) => {
                 const quantityOfProduct = tempCart.lineItems.reduce((total, item) => {
                   if (item.productId === product.id) {
@@ -390,40 +410,53 @@ export default function TicketScreen() {
                 );
               })}
             </View>
-          </View>
+          </View> */}
 
-          {/* GOODIE BAG */}
-          <View className='flex mt-12'>
-            <Text className='text-slate-700 font-NotoSansBold text-2xl'>GOODIE BAG</Text>
-            <Text className='text-slate-700 font-NotoSans text-lg mt-2'>
-              Includes: Taste of Japan T-shirt Chicken Teriyaki Meal Snacks Drink Tote bag Sponsored Goodies
-            </Text>
-            <View className='flex-row justify-between gap-3 mt-8'>
-              {goodieBags?.map((product: any) => {
-                const quantityOfProduct = tempCart.lineItems.reduce((total, item) => {
-                  if (item.productId === product.id) {
-                    return total + item.quantity;
-                  }
-                  return total;
-                }, 0);
-                return (
-                  <View key={product.id} className='items-center justify-center' style={{ width: (deviceWidth - 54) / 2 }}>
-                    <TouchableOpacity className='w-full' onPress={() => onPressProduct(product.id)}>
-                      <Image source={product.images.edges[0].node.url} contentFit='cover' style={{ width: '100%', height: 200, borderRadius: 10 }} />
-                      <Text className='text-slate-700 text-md font-NotoSansBold mt-2'>{product.title}</Text>
-                      <View className='flex-row justify-between items-center'>
-                        <Text className='text-slate-700 text-lg font-NotoSansBold mt-2'>
-                          ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
-                        </Text>
-                        {quantityOfProduct > 0 && (
-                          <View className={`flex-row px-2 py-0.5 bg-red-600 rounded-full justify-between items-center`}>
-                            <Ionicons name='cart' color='white' size={18} />
-                            <Text className='text-white text-md font-NotoSansBold'> {quantityOfProduct}</Text>
-                          </View>
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                    {/* <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
+            {/* FOOD PRE-ORDER */}
+            <View className='flex'>
+              <View className='flex px-6'>
+                <Text className='text-slate-700 font-NotoSansBold text-2xl'>FOOD PRE-ORDER</Text>
+                <Text className='text-slate-700 font-NotoSans text-md mt-1'>Order in advance & earn extra points. Skip the line!</Text>
+              </View>
+              <PreOrderHorizontalScrollView category='Food' color='white' pl={0} />
+            </View>
+
+            {/* GOODIE BAG */}
+            <View className='flex px-6'>
+              <Text className='text-slate-700 font-NotoSansBold text-2xl'>GOODIE BAG</Text>
+              <Text className='text-slate-700 font-NotoSans text-md mt-1'>
+                Includes: Taste of Japan T-shirt Chicken Teriyaki Meal Snacks Drink Tote bag Sponsored Goodies
+              </Text>
+              <View className='flex-row justify-between gap-3 mt-8'>
+                {goodieBags?.map((product: any) => {
+                  const quantityOfProduct = tempCart.lineItems.reduce((total, item) => {
+                    if (item.productId === product.id) {
+                      return total + item.quantity;
+                    }
+                    return total;
+                  }, 0);
+                  return (
+                    <View key={product.id} className='items-center justify-center' style={{ width: (deviceWidth - 54) / 2 }}>
+                      <TouchableOpacity className='w-full' onPress={() => onPressProduct(product.id)}>
+                        <Image
+                          source={product.images.edges[0].node.url}
+                          contentFit='cover'
+                          style={{ width: '100%', height: 200, borderRadius: 10 }}
+                        />
+                        <Text className='text-slate-700 text-md font-NotoSansBold mt-2'>{product.title}</Text>
+                        <View className='flex-row justify-between items-center'>
+                          <Text className='text-slate-700 text-lg font-NotoSansBold mt-2'>
+                            ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
+                          </Text>
+                          {quantityOfProduct > 0 && (
+                            <View className={`flex-row px-2 py-0.5 bg-red-600 rounded-full justify-between items-center`}>
+                              <Ionicons name='cart' color='white' size={18} />
+                              <Text className='text-white text-md font-NotoSansBold'> {quantityOfProduct}</Text>
+                            </View>
+                          )}
+                        </View>
+                      </TouchableOpacity>
+                      {/* <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
                       <TouchableOpacity
                         className='items-center justify-center'
                         onPress={() => onPressRemoveGoodieBag(product.id, product.variants.edges[0].node.id)}
@@ -442,21 +475,24 @@ export default function TicketScreen() {
                         <Ionicons name='add' color='black' size={18} />
                       </TouchableOpacity>
                     </View> */}
-                  </View>
-                );
-              })}
+                    </View>
+                  );
+                })}
+              </View>
             </View>
-          </View>
 
-          {/* Next Button */}
+            <View className='h-20' />
+          </View>
+        </ScrollView>
+        {/* Next Button */}
+        <View className='flex w-full bg-white absolute bottom-0 px-4 py-3 justify-center items-center'>
           <TouchableOpacity
-            className={`mt-12 bg-red-600 p-4 rounded-md w-full`}
+            className={`${tempCart.lineItems.length ? 'bg-red-600' : 'bg-[#fff1ec]'} h-12 items-center justify-center rounded-md w-full`}
             onPress={tempCart.lineItems.length ? onPressBuy : () => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}>
-            <Text className='text-white text-center text-xl font-NotoSansBold'>
+            <Text className={`${tempCart.lineItems.length ? 'text-white' : 'text-black'} text-center text-xl font-NotoSansBold`}>
               {tempCart.lineItems.length ? `View cart (${cartItemCount})` : 'Please select admission tickets'}
             </Text>
           </TouchableOpacity>
-          <View className='h-12' />
         </View>
       </View>
       <Modal animationType='fade' transparent={true} visible={modalVisible} onRequestClose={closeModal}>
@@ -479,6 +515,6 @@ export default function TicketScreen() {
           </View>
         </TouchableWithoutFeedback>
       </Modal>
-    </ScrollView>
+    </SafeAreaView>
   );
 }

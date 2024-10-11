@@ -13,10 +13,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "buildNumber": "3",
       "supportsTablet": false,
       "bundleIdentifier": "com.tasteofjpn",
       "userInterfaceStyle": "automatic",
+      "buildNumber": "1",
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -29,7 +29,8 @@
         "googleMapsApiKey": "AIzaSyDA9YELNh-rxBJW27SWef85YgX4Ppa4AdA"
       },
       "infoPlist": {
-        "LSMinimumSystemVersion": "12.0"
+        "LSMinimumSystemVersion": "12.0",
+        "NSLocationWhenInUseUsageDescription": "This app requires location access to show maps properly."
       }
     },
     "android": {
