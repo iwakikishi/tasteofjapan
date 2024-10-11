@@ -1,194 +1,180 @@
 // src/screens/LoginScreen.js
 import React, { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { supabase } from '@/lib/supabase-client';
 import { HelloWave } from '@/components/HelloWave';
 import GoogleButton from '@/components/GoogleButton';
-import { useTicketCart } from '@/context/CartContext';
+import Checkbox from 'expo-checkbox';
+import { useCreateUser } from '@/functions/user-create';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
-  const { setUser } = useAuth() as { user: any; setUser: (user: any) => void };
-  const { ticketCart } = useTicketCart() as { ticketCart: any };
+  const { user, setUser } = useAuth() as { user: any; setUser: (user: any) => void };
   const router = useRouter();
-  const [isSignUp, setIsSignUp] = useState(true);
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const { colors } = useTheme();
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isMarketingAccepted, setIsMarketingAccepted] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { createUser } = useCreateUser();
 
-  const sendVerificationCode = async () => {
-    const { data, error } = await supabase.auth.signInWithOtp({ phone: phoneNumber });
-    if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      Alert.alert('Success', 'Verification code sent!');
-    }
-  };
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user) {
+        router.back();
+      }
+    }, [user])
+  );
 
-  const signUp = async () => {
-    if (!email) {
-      Alert.alert('Error', 'Please enter your email address.');
+  const handleSignUp = async () => {
+    setIsLoading(true);
+    if (!email || password !== confirmPassword) {
+      setIsLoading(false);
+      Alert.alert('Error', 'Please enter your email address and ensure passwords match.');
       return;
     }
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match.');
-      return;
-    }
+
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
+      const { shopifyCustomer, supabaseUserId } = await createUser({
+        email,
+        password,
+        acceptsMarketing: isMarketingAccepted,
       });
-      if (error) {
-        throw error;
-      } else {
-        Alert.alert('Success', 'Please check your email for the verification code.');
 
-        if (data.user) {
-          router.push('/register');
-        } else {
-          Alert.alert('エラー', 'ユーザー情報が取得できませんでした。');
-        }
+      if (shopifyCustomer && supabaseUserId) {
+        setUser({
+          ...user,
+          id: supabaseUserId,
+          email: email,
+          shopifyCustomerId: shopifyCustomer.id,
+        });
+        router.push('/register');
+        setIsLoading(false);
+        setPassword('');
+        setConfirmPassword('');
       }
     } catch (error) {
-      if (error instanceof Error && error.message.includes('User already registered')) {
-        router.push('/order-confirmation');
-      } else {
-        Alert.alert('Error', 'Failed to sign up. Please try again later.');
-      }
-      console.log(error);
+      const errorMessage = error instanceof Error ? error.message : 'Error';
+      setIsLoading(false);
+      Alert.alert('Error', errorMessage);
     }
   };
 
   const login = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.signInWithPassword({
+    setIsLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({
       email: email,
-      password: password,
+      options: {
+        shouldCreateUser: false,
+      },
     });
     if (error) {
-      Alert.alert('Error', error.message);
-    } else {
-      if (user) {
-        const { data, error } = await supabase.from('user_profile').select('first_name,last_name,device_token').eq('user_id', user.id).single();
-        if (error) {
-          Alert.alert('Error', error.message);
-        } else {
-          setUser({
-            id: user.id,
-            email: user.email,
-            phone: user.phone || '',
-            firstName: data.first_name,
-            lastName: data.last_name,
-            deviceToken: data.device_token || '',
-          });
-          if (cart.length > 0) {
-            router.push('/order-confirmation');
-          } else {
-            router.back();
-          }
-        }
-      }
+      setIsLoading(false);
+      Alert.alert('Error', `\n${error.message}\nPlease check your email and password.`);
+      return;
     }
+    router.push({ pathname: '/verification', params: { email } });
+    setIsLoading(false);
   };
 
+  if (isLoading) {
+    return (
+      <View className='flex-1 items-center justify-center -mt-20' style={{ backgroundColor: colors.background }}>
+        <ActivityIndicator size='large' color={'white'} />
+      </View>
+    );
+  }
+
   return (
-    <View className='flex p-4'>
-      <View className='flex-row items-center mt-12'>
-        <Text className='text-white text-3xl font-bold mr-4'>Hi there</Text>
-        <HelloWave />
-      </View>
-      <View className='flex mt-6'>
-        <Text className='text-white text-lg font-semibold'>Please enter your email and password to create your account</Text>
-      </View>
-      <View className='flex-row items-center mt-6'>
-        <Text className='text-white text-md'>If you already have an account, please sign in </Text>
-        <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
-          <Text className='text-red-500 font-semibold text-lg'>here</Text>
-        </TouchableOpacity>
-      </View>
-      {isSignUp ? (
-        <View className='flex mt-8'>
-          <View className='flex'>
-            <Text className='text-white text-sm font-semibold'>Email</Text>
-            <TextInput
-              className='w-full h-[48px] border border-white rounded-lg p-2 text-white mt-2'
-              placeholder='xxx@your-email.com'
-              keyboardType='email-address'
-              value={email}
-              onChangeText={setEmail}
-            />
-          </View>
-          <View className='flex my-8'>
-            <Text className='text-white text-sm font-semibold'>Password</Text>
-            <TextInput
-              className='w-full h-[48px] border border-white rounded-lg p-2 text-white mt-2'
-              placeholder='Password'
-              keyboardType='default'
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
-          <View className='flex'>
-            <Text className='text-white text-sm font-semibold'>Confirm Password</Text>
-            <TextInput
-              className='w-full h-[48px] border border-white rounded-lg p-2 text-white mt-2'
-              placeholder='Confirm Password'
-              keyboardType='default'
-              value={confirmPassword}
-              onChangeText={setConfirmPassword}
-            />
-          </View>
-          <TouchableOpacity
-            className={`bg-white rounded-lg py-2 px-4 mt-8 self-start ${!email ? 'opacity-50' : ''}`}
-            // disabled={!email}
-            onPress={signUp}>
-            <Text className='text-black text-lg font-bold'>Send Verification Code</Text>
-          </TouchableOpacity>
-          {/* <TouchableOpacity className='bg-white rounded-lg py-2 px-4 mt-8 self-start' onPress={sendVerificationCode}>
-          <Text className='text-black text-lg'>Send Verification Code</Text>
-        </TouchableOpacity> */}
-          {/* <GoogleButton /> */}
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+      <View className='flex-1 p-6' style={{ backgroundColor: colors.background }}>
+        <View className='flex-row items-center mt-12'>
+          <Text className='text-white text-3xl font-bold mr-4'>{isSignUp ? 'Hi there' : 'Log in'}</Text>
+          <HelloWave />
         </View>
-      ) : (
+        <View className='flex mt-6'>
+          <Text className='text-white text-lg font-semibold'>
+            {isSignUp
+              ? 'Please enter your email and password to create your account'
+              : 'Please enter your email. We will send you a verification code to your email.'}
+          </Text>
+        </View>
+        <View className='flex-row items-center mt-6'>
+          <Text className='text-white text-md'>
+            {isSignUp ? 'If you already have an account, please sign in ' : 'If you do not have an account, please sign up '}{' '}
+          </Text>
+          <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
+            <Text className='text-red-500 font-semibold text-2xl'>here</Text>
+          </TouchableOpacity>
+        </View>
+
         <View className='flex mt-8'>
           <View className='flex'>
             <Text className='text-white text-sm font-semibold'>Email</Text>
             <TextInput
-              className='w-full h-[48px] border border-white rounded-lg p-2 text-white mt-2'
+              className='w-full h-[48px] border border-white rounded-lg px-4 pb-1 text-xl text-white mt-2'
               placeholder='xxx@your-email.com'
               keyboardType='email-address'
               value={email}
               onChangeText={setEmail}
+              autoCapitalize='none'
             />
           </View>
-          <View className='flex my-8'>
-            <Text className='text-white text-sm font-semibold'>Password</Text>
-            <TextInput
-              className='w-full h-[48px] border border-white rounded-lg p-2 text-white mt-2'
-              placeholder='Password'
-              keyboardType='default'
-              value={password}
-              onChangeText={setPassword}
-            />
-          </View>
+          {isSignUp && (
+            <>
+              <View className='flex mt-8'>
+                <Text className='text-white text-sm font-semibold'>Password</Text>
+                <TextInput
+                  className='w-full h-[48px] border border-white rounded-lg px-4 py-2 text-white mt-2'
+                  placeholder='Password'
+                  keyboardType='default'
+                  value={password}
+                  secureTextEntry={!showPassword}
+                  onChangeText={setPassword}
+                />
+                <TouchableOpacity
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: [{ translateY: -12 }] }}
+                  onPress={() => setShowPassword(!showPassword)}>
+                  <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={24} color='white' style={{ top: 12 }} />
+                </TouchableOpacity>
+              </View>
+              <View className='flex mt-8'>
+                <Text className='text-white text-sm font-semibold'>Confirm Password</Text>
+                <TextInput
+                  className='w-full h-[48px] border border-white rounded-lg px-4 py-2 text-white mt-2'
+                  placeholder='Password'
+                  keyboardType='default'
+                  secureTextEntry={!showConfirmPassword}
+                  value={confirmPassword}
+                  onChangeText={setConfirmPassword}
+                />
+                <TouchableOpacity
+                  style={{ position: 'absolute', right: 10, top: '50%', transform: [{ translateY: -12 }] }}
+                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={24} color='white' style={{ top: 12 }} />
+                </TouchableOpacity>
+              </View>
+              <View className='flex-row items-center justify-center mt-6 px-4'>
+                <Checkbox value={isMarketingAccepted} onValueChange={setIsMarketingAccepted} className='mr-4' />
+                <Text className='text-white text-sm font-semibold'>Keep me updated with Taste of Japan's latest news and exclusive offers</Text>
+              </View>
+            </>
+          )}
 
           <TouchableOpacity
             className={`bg-white rounded-lg py-2 px-4 mt-8 self-start ${!email ? 'opacity-50' : ''}`}
-            // disabled={!email}
-            onPress={login}>
-            <Text className='text-black text-lg font-bold'>Log in</Text>
+            onPress={isSignUp ? handleSignUp : login}>
+            <Text className='text-black text-lg font-bold'>{isSignUp ? 'Sign up' : 'Log in'}</Text>
           </TouchableOpacity>
-          {/* <TouchableOpacity className='bg-white rounded-lg py-2 px-4 mt-8 self-start' onPress={sendVerificationCode}>
-          <Text className='text-black text-lg'>Send Verification Code</Text>
-        </TouchableOpacity> */}
-          {/* <GoogleButton /> */}
         </View>
-      )}
-    </View>
+      </View>
+    </KeyboardAvoidingView>
   );
 }

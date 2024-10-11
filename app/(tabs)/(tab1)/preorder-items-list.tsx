@@ -56,7 +56,7 @@ export default function FoodPreOrderVendorList() {
 
   const onPressVendor = (vendor: Vendor) => {
     router.navigate({
-      pathname: 'food-vendor-page',
+      pathname: 'vendor',
       params: { vendor: JSON.stringify(vendor) }, // vendor を JSON 文字列として渡す
     });
   };
@@ -65,9 +65,9 @@ export default function FoodPreOrderVendorList() {
     '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
   return (
-    <View className='flex flex-col px-2'>
+    <View className='flex flex-col h-full px-2 bg-black'>
       <FlatList
-        className='flex'
+        className='flex '
         data={filteredVendors}
         stickyHeaderIndices={[0]}
         renderItem={({ item }) => {

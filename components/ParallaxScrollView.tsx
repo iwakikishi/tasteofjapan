@@ -1,5 +1,5 @@
 import { useEffect, type PropsWithChildren, type ReactElement } from 'react';
-import { Dimensions, StyleSheet, useColorScheme, View } from 'react-native';
+import { Dimensions, useColorScheme, View } from 'react-native';
 import Animated, {
   interpolate,
   useAnimatedRef,
@@ -9,11 +9,17 @@ import Animated, {
   useSharedValue,
   withTiming,
   Easing,
+  useAnimatedScrollHandler,
+  Extrapolate,
 } from 'react-native-reanimated';
+import { HeaderLeft } from './HeaderLeft';
+import { useTheme } from '@/context/ThemeContext';
+import { HeaderRight } from './HeaderRight';
 
 const deviceWidth = Dimensions.get('window').width;
 
 const HEADER_HEIGHT = deviceWidth * 1.546;
+const NORMAL_HEADER_HEIGHT = 38;
 
 type Props = PropsWithChildren<{
   headerImage: ReactElement;
@@ -21,10 +27,12 @@ type Props = PropsWithChildren<{
 }>;
 
 export default function ParallaxScrollView({ children, headerImage, headerBackgroundColor }: Props) {
+  const { colors } = useTheme();
   const colorScheme = useColorScheme() ?? 'light';
   const scrollRef = useAnimatedRef<Animated.ScrollView>();
   const scrollOffset = useScrollViewOffset(scrollRef);
   const initialScale = useSharedValue(0);
+  const headerOpacity = useSharedValue(0);
 
   useEffect(() => {
     initialScale.value = withTiming(
@@ -48,7 +56,12 @@ export default function ParallaxScrollView({ children, headerImage, headerBackgr
     return {
       transform: [
         {
-          translateY: interpolate(scrollOffset.value, [-HEADER_HEIGHT, 0, HEADER_HEIGHT], [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75]),
+          translateY: interpolate(
+            scrollOffset.value,
+            [-HEADER_HEIGHT, 0, HEADER_HEIGHT],
+            [-HEADER_HEIGHT / 2, 0, HEADER_HEIGHT * 0.75],
+            Extrapolate.CLAMP
+          ),
         },
         {
           scale: withSpring(scrollScale * initialScale.value, {
@@ -62,30 +75,39 @@ export default function ParallaxScrollView({ children, headerImage, headerBackgr
     };
   });
 
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      const offsetY = event.contentOffset.y;
+      headerOpacity.value = interpolate(offsetY, [HEADER_HEIGHT - NORMAL_HEADER_HEIGHT, HEADER_HEIGHT], [0, 1], Extrapolate.CLAMP);
+    },
+  });
+
+  const headerStyle = useAnimatedStyle(() => {
+    return {
+      opacity: headerOpacity.value,
+      position: 'absolute',
+      top: 2,
+      left: 0,
+      right: 0,
+      height: NORMAL_HEADER_HEIGHT,
+      backgroundColor: 'transparent',
+    };
+  });
+
   return (
-    <View className='flex bg-black'>
-      <Animated.ScrollView ref={scrollRef} scrollEventThrottle={16}>
-        <Animated.View style={[styles.header, { backgroundColor: headerBackgroundColor[colorScheme] }, headerAnimatedStyle]}>
+    <View className='flex-1' style={{ backgroundColor: colors.background }}>
+      <Animated.ScrollView ref={scrollRef} scrollEventThrottle={16} onScroll={scrollHandler} className='flex-1'>
+        <Animated.View
+          className='overflow-hidden'
+          style={[{ height: HEADER_HEIGHT, backgroundColor: headerBackgroundColor[colorScheme] }, headerAnimatedStyle]}>
           {headerImage}
         </Animated.View>
-        <View className='flex'>{children}</View>
+        <View className='flex-1'>{children}</View>
       </Animated.ScrollView>
+      <Animated.View className='flex-row items-center justify-between px-4' style={headerStyle}>
+        <HeaderLeft />
+        <HeaderRight />
+      </Animated.View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    height: deviceWidth * 1.56,
-    overflow: 'hidden',
-  },
-  content: {
-    flex: 1,
-    padding: 12,
-    gap: 16,
-    overflow: 'hidden',
-  },
-});

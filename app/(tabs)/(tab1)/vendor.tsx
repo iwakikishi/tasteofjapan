@@ -18,17 +18,36 @@ import {
   BottomSheetScrollView,
 } from '@gorhom/bottom-sheet';
 
-type Vendor = Database['public']['Tables']['vendors']['Row'];
-
-type Menu = Database['public']['Tables']['menus']['Row'] & {
-  quantity: number;
-  images: { uri: string; order: number }[];
-  price: number;
-  currentStock: number;
-  vendor: Vendor;
+type ImageType = {
+  url: string;
 };
 
-type ImageType = { uri: string; order: number };
+type ImageEdge = {
+  node: Image;
+};
+
+type ImageConnection = {
+  edges: ImageEdge[];
+};
+
+type PriceRange = {
+  minVariantPrice: {
+    amount: string;
+    currencyCode: string;
+  };
+};
+
+type Product = {
+  node: {
+    __typename: 'Product';
+    description: string;
+    id: string;
+    images: ImageConnection;
+    priceRange: PriceRange;
+    title: string;
+    vendor: string;
+  };
+};
 
 type StockWindow = {
   [date: string]: {
@@ -66,7 +85,7 @@ export default function FoodVendorPage() {
   const router = useRouter();
   const { foodCart, setFoodCart } = useFoodCart();
   const { user } = useAuth();
-  const { vendor } = useLocalSearchParams();
+  const { product } = useLocalSearchParams();
 
   const [selectedDate, setSelectedDate] = useState(0);
   const [selectedTime, setSelectedTime] = useState('1100');
@@ -74,18 +93,31 @@ export default function FoodVendorPage() {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [inventory, setInventory] = useState<InventoryType>({});
 
-  const vendorData: Vendor = JSON.parse(vendor as string);
+  const productData: Product = JSON.parse(product as string);
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
   // variables
   const snapPoints = useMemo(() => [1, '95%'], []);
 
-  const images = (vendorData?.images as ImageType[]) ?? [];
+  return (
+    <View className='flex-1 bg-black justify-center items-center'>
+      <Text className='text-white text-2xl font-bold'>coming soon</Text>
+    </View>
+  );
+
+  const images = (() => {
+    const productNode = productData?.node;
+    if (!productNode || !productNode.images || !productNode.images.edges) return [];
+
+    const imageNodes = productNode.images.edges.map((edge) => edge.node) as ImageType[];
+    if (imageNodes.length === 0) return [];
+    return imageNodes.length === 1 ? [imageNodes[0]] : imageNodes;
+  })();
 
   useEffect(() => {
     const fetchMenus = async () => {
-      const { data, error } = await supabase.from('menus').select(`*, vendor (name)`).eq('vendor', vendorData.id);
+      const { data, error } = await supabase.from('menus').select(`*, vendor (name)`).eq('vendor', productData.id);
       if (error) {
         console.log(error);
       } else {
@@ -98,6 +130,7 @@ export default function FoodVendorPage() {
             time: cartItem ? cartItem.time : '',
           };
         });
+        console.log(quantityAddedData);
         setMenus(quantityAddedData);
 
         const inventoryData: InventoryType = {};
@@ -254,9 +287,9 @@ export default function FoodVendorPage() {
                 <VendorCarousel images={images} />
               </View>
               <View className='flex px-4 gap-4'>
-                <Text className='text-white text-2xl font-bold'>{vendorData?.name}</Text>
+                <Text className='text-white text-2xl font-bold'>{productData?.node.title}</Text>
                 <ReadMore numberOfLines={3} style={{ color: 'white' }}>
-                  {vendorData?.descriptions}
+                  {productData?.node.description}
                 </ReadMore>
               </View>
               <View className='flex flex-col px-4'>

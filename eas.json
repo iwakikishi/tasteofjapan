@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 7.8.1"
+    "version": ">= 7.8.1",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -8,14 +9,28 @@
       "distribution": "internal",
       "ios": {
         "simulator": true
+      },
+      "android": {
+        "buildType": "apk",
       }
     },
     "preview": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "autoIncrement": true
+    }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "../path/to/api-xxx-yyy-zzz.json",
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "web@tanoshii-project.com",
+        "appleTeamId": "FVL786NPDP"
+      }
+    }
   }
 }
