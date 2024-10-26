@@ -55,7 +55,7 @@ export const updateUser = async ({
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('ユーザー登録中にエラーが発生しました:', error);
+    console.error('Error updating user:', error);
     return null;
   }
 };

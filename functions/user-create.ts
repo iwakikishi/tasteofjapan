@@ -38,7 +38,28 @@ export const useCreateUser = () => {
       });
 
       if (data.customerCreate.customerUserErrors.length > 0) {
-        throw new Error(`Shopify Error: ${data.customerCreate.customerUserErrors[0].message}`);
+        // const { data: { session } } = await supabase.auth.getSession();
+        // if (!session) {
+        //   throw new Error('Current session not found');
+        // }
+        // const response = await fetch(
+        //   'https://wtgcaqmwnsdisvxppano.supabase.co/functions/v1/supabase-user-deletion',
+        //   {
+        //     method: 'POST', 
+        //     headers: {
+        //       'Authorization': `Bearer ${session.access_token}`,
+        //       'Content-Type': 'application/json',
+        //     },
+        //     body: JSON.stringify({
+        //       supabaseUserId,
+        //     }),
+        //   }
+        // );
+
+        // const data = await response.json();
+        // return data;
+        throw new Error(`Error: You have already signed up with this email address on our website.`);
+        
       }
 
       const shopifyCustomerId = data.customerCreate.customer.id;

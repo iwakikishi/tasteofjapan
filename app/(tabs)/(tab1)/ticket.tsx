@@ -418,7 +418,7 @@ export default function TicketScreen() {
                 <Text className='text-slate-700 font-NotoSansBold text-2xl'>FOOD PRE-ORDER</Text>
                 <Text className='text-slate-700 font-NotoSans text-md mt-1'>Order in advance & earn extra points. Skip the line!</Text>
               </View>
-              <PreOrderHorizontalScrollView category='Food' color='white' pl={0} />
+              <PreOrderHorizontalScrollView category='Food' color='white' pl={0} price={true} />
             </View>
 
             {/* GOODIE BAG */}
@@ -436,24 +436,29 @@ export default function TicketScreen() {
                     return total;
                   }, 0);
                   return (
-                    <View key={product.id} className='items-center justify-center' style={{ width: (deviceWidth - 54) / 2 }}>
-                      <TouchableOpacity className='w-full' onPress={() => onPressProduct(product.id)}>
+                    <View key={product.id} className='items-center justify-center relative' style={{ width: (deviceWidth - 54) / 2 }}>
+                      <TouchableOpacity className='w-full bg-white rounded-xl overflow-hidden' onPress={() => onPressProduct(product.id)}>
                         <Image
                           source={product.images.edges[0].node.url}
                           contentFit='cover'
-                          style={{ width: '100%', height: 200, borderRadius: 10 }}
+                          style={{ width: '100%', height: 200, borderRadius: 10, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
                         />
-                        <Text className='text-slate-700 text-md font-NotoSansBold mt-2'>{product.title}</Text>
-                        <View className='flex-row justify-between items-center'>
-                          <Text className='text-slate-700 text-lg font-NotoSansBold mt-2'>
-                            ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
-                          </Text>
-                          {quantityOfProduct > 0 && (
-                            <View className={`flex-row px-2 py-0.5 bg-red-600 rounded-full justify-between items-center`}>
-                              <Ionicons name='cart' color='white' size={18} />
-                              <Text className='text-white text-md font-NotoSansBold'> {quantityOfProduct}</Text>
-                            </View>
-                          )}
+                        <View className='absolute top-0 right-0 bg-red-500/80 px-4 py-1 rounded-bl-2xl'>
+                          <Text className='text-white font-NotoSansBold text-md'>1000 pts</Text>
+                        </View>
+                        <View className='flex p-2'>
+                          <Text className='text-slate-700 text-md font-NotoSansBold'>{product.title}</Text>
+                          <View className='flex-row justify-between items-baseline mt-2'>
+                            <Text className='text-slate-700 text-lg font-NotoSansBold'>
+                              ${parseFloat(product.priceRange.minVariantPrice.amount).toFixed(2)}
+                            </Text>
+                            {quantityOfProduct > 0 && (
+                              <View className={`flex-row px-2 py-0.5 bg-red-600 rounded-full justify-between items-center`}>
+                                <Ionicons name='cart' color='white' size={18} />
+                                <Text className='text-white text-md font-NotoSansBold'> {quantityOfProduct}</Text>
+                              </View>
+                            )}
+                          </View>
                         </View>
                       </TouchableOpacity>
                       {/* <View className='flex-row rounded-full w-full h-10 bg-white items-center justify-between px-4 mt-4'>
@@ -487,9 +492,12 @@ export default function TicketScreen() {
         {/* Next Button */}
         <View className='flex w-full bg-white absolute bottom-0 px-4 py-3 justify-center items-center'>
           <TouchableOpacity
-            className={`${tempCart.lineItems.length ? 'bg-red-600' : 'bg-[#fff1ec]'} h-12 items-center justify-center rounded-md w-full`}
+            className={`${tempCart.lineItems.length ? 'bg-red-600' : 'bg-[#fff1ec]'} py-3 items-center justify-center rounded-md w-full`}
             onPress={tempCart.lineItems.length ? onPressBuy : () => scrollViewRef.current?.scrollTo({ y: 0, animated: true })}>
-            <Text className={`${tempCart.lineItems.length ? 'text-white' : 'text-black'} text-center text-xl font-NotoSansBold`}>
+            <Text
+              className={`${tempCart.lineItems.length ? 'text-white' : 'text-black'} text-center ${
+                tempCart.lineItems.length ? 'text-xl' : 'text-lg'
+              } font-NotoSansBold`}>
               {tempCart.lineItems.length ? `View cart (${cartItemCount})` : 'Please select admission tickets'}
             </Text>
           </TouchableOpacity>

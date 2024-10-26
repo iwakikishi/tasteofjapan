@@ -38,13 +38,13 @@ export default function TabLayout() {
             tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} size={23} />,
           }}
         />
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name='(tab3)'
           options={{
             title: 'Scan',
             tabBarIcon: ({ color, focused }) => <TabBarIcon name={focused ? 'scan' : 'scan-outline'} color={color} size={23} />,
           }}
-        />
+        /> */}
         <Tabs.Screen
           name='(tab4)'
           options={{

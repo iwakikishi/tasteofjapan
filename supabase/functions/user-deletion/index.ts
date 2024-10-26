@@ -90,13 +90,13 @@ serve(async (req: Request) => {
     }
 
     return new Response(
-  JSON.stringify({
-    message: 'User deleted successfully',
-    status: 200,
-    success: true
-  }),
-  {
-    headers: { 'Content-Type': 'application/json' },
+      JSON.stringify({
+        message: 'User deleted successfully',
+        status: 200,
+        success: true
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
     status: 200
   }
 );

@@ -139,7 +139,7 @@ async function updateSupabaseProfile(userId: string,id: string, firstName: strin
       ethnicity,
       gender,
       zip_code: zipcode,
-      points: 1000,
+      points: 3000,
       device_token: deviceToken,
     })
     .eq('user_id', userId)
@@ -156,7 +156,7 @@ async function updateSupabaseProfile(userId: string,id: string, firstName: strin
 async function upsertSupabasePoints(id: string) {
   const { data, error } = await supabase
     .from('points')
-    .insert({ user_id: id, points: 1000, action: 'ADD', how: 'SIGNUP' })
+    .insert({ user_id: id, points: 3000, action: 'ADD', how: 'SIGNUP' })
     .select()
 
   if (error) {

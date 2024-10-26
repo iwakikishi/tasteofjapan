@@ -8,7 +8,7 @@ export default function _Layout() {
   const { colors } = useTheme();
 
   const HeaderTitle = ({ title }: { title: string }) => (
-    <Text className='text-xl' style={{ color: colors.headerText }}>
+    <Text className='text-lg font-NotoSansBold' style={{ color: colors.headerText }}>
       {title}
     </Text>
   );
@@ -34,6 +34,12 @@ export default function _Layout() {
           headerStyle: { backgroundColor: 'transparent' },
           headerTintColor: colors.headerText,
           headerTitle: () => <HeaderTitle title='' />,
+          headerTitleStyle: {
+            color: colors.headerText,
+            fontSize: 18,
+            fontWeight: 'bold',
+            fontFamily: 'NotoSans-Bold',
+          },
           headerRight: () => <HeaderRight />,
           headerLeft: MapButton,
           headerBackVisible: false,
@@ -47,6 +53,12 @@ export default function _Layout() {
           headerBackVisible: false,
           headerBackTitleVisible: false,
           headerTitle: () => <HeaderTitle title='Goodie Bag' />,
+          headerTitleStyle: {
+            color: colors.headerText,
+            fontSize: 18,
+            fontWeight: 'bold',
+            fontFamily: 'NotoSans-Bold',
+          },
           headerLeft: BackButton,
         }}
       />

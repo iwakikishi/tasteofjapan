@@ -184,16 +184,18 @@ export default function SearchScreen() {
 
   const TopButtons = () => {
     return (
-      <View className='flex-row w-full h-[60px] items-center px-4'>
-        <TouchableHighlight className={`rounded-full px-6 py-1 ${selectedTab === 0 ? 'bg-red-600' : 'bg-gray-800'}`} onPress={() => onPressTab(0)}>
+      <View className='flex-row w-full h-[60px] items-center px-6'>
+        <TouchableHighlight
+          className={`p-1  border-b-4 ${selectedTab === 0 ? 'border-red-600' : 'border-transparent'}`}
+          onPress={() => onPressTab(0)}>
           <Text className={`text-white text-lg ${selectedTab === 0 ? 'font-NotoSansBold' : 'font-NotoSans'}`}>Stage</Text>
         </TouchableHighlight>
         <TouchableHighlight
-          className={`mx-2 rounded-full px-6 py-1 ${selectedTab === 1 ? 'bg-red-600' : 'bg-gray-800'}`}
+          className={`mx-4 p-1 border-b-4 ${selectedTab === 1 ? 'border-red-600' : 'border-transparent'}`}
           onPress={() => onPressTab(1)}>
           <Text className={`text-white text-lg ${selectedTab === 1 ? 'font-NotoSansBold' : 'font-NotoSans'}`}>Food</Text>
         </TouchableHighlight>
-        <TouchableHighlight className={`rounded-full px-6 py-1 ${selectedTab === 2 ? 'bg-red-600' : 'bg-gray-800'}`} onPress={() => onPressTab(2)}>
+        <TouchableHighlight className={`p-1 border-b-4 ${selectedTab === 2 ? 'border-red-600' : 'border-transparent'}`}>
           <Text className={`text-white text-lg ${selectedTab === 2 ? 'font-NotoSansBold' : 'font-NotoSans'}`}>Retail</Text>
         </TouchableHighlight>
       </View>

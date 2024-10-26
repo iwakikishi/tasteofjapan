@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { supabase } from '@/lib/supabase-client';
 import { HelloWave } from '@/components/HelloWave';
 import GoogleButton from '@/components/GoogleButton';
@@ -15,7 +15,7 @@ export default function LoginScreen() {
   const { user, setUser } = useAuth() as { user: any; setUser: (user: any) => void };
   const router = useRouter();
   const { colors } = useTheme();
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -93,8 +93,11 @@ export default function LoginScreen() {
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-      <View className='flex-1 p-6' style={{ backgroundColor: colors.background }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}>
+      <ScrollView className='flex p-6' style={{ backgroundColor: colors.background }} contentContainerStyle={{ flexGrow: 1 }}>
         <View className='flex-row items-center mt-12'>
           <Text className='text-white text-3xl font-bold mr-4'>{isSignUp ? 'Hi there' : 'Log in'}</Text>
           <HelloWave />
@@ -106,12 +109,12 @@ export default function LoginScreen() {
               : 'Please enter your email. We will send you a verification code to your email.'}
           </Text>
         </View>
-        <View className='flex-row items-center mt-6'>
+        <View className='flex-row flex-wrap items-center mt-6'>
           <Text className='text-white text-md'>
-            {isSignUp ? 'If you already have an account, please sign in ' : 'If you do not have an account, please sign up '}{' '}
+            {isSignUp ? 'If you already have an account, please ' : 'If you do not have an account, please sign up '}{' '}
           </Text>
           <TouchableOpacity onPress={() => setIsSignUp(!isSignUp)}>
-            <Text className='text-red-500 font-semibold text-2xl'>here</Text>
+            <Text className='text-red-500 text-xl font-NotoSansBold'>{isSignUp ? 'log in here' : 'sign up here'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -119,8 +122,9 @@ export default function LoginScreen() {
           <View className='flex'>
             <Text className='text-white text-sm font-semibold'>Email</Text>
             <TextInput
-              className='w-full h-[48px] border border-white rounded-lg px-4 pb-1 text-xl text-white mt-2'
+              className='w-full h-[48px] border border-gray-400 rounded-lg px-4 pb-1 text-xl text-white mt-2'
               placeholder='xxx@your-email.com'
+              placeholderTextColor='gray'
               keyboardType='email-address'
               value={email}
               onChangeText={setEmail}
@@ -132,8 +136,9 @@ export default function LoginScreen() {
               <View className='flex mt-8'>
                 <Text className='text-white text-sm font-semibold'>Password</Text>
                 <TextInput
-                  className='w-full h-[48px] border border-white rounded-lg px-4 py-2 text-white mt-2'
+                  className='w-full h-[48px] border border-gray-400 rounded-lg px-4 pb-2 text-white text-lg mt-2'
                   placeholder='Password'
+                  placeholderTextColor='gray'
                   keyboardType='default'
                   value={password}
                   secureTextEntry={!showPassword}
@@ -148,8 +153,9 @@ export default function LoginScreen() {
               <View className='flex mt-8'>
                 <Text className='text-white text-sm font-semibold'>Confirm Password</Text>
                 <TextInput
-                  className='w-full h-[48px] border border-white rounded-lg px-4 py-2 text-white mt-2'
+                  className='w-full h-[48px] border border-gray-400 rounded-lg px-4 pb-2 text-white text-lg mt-2'
                   placeholder='Password'
+                  placeholderTextColor='gray'
                   keyboardType='default'
                   secureTextEntry={!showConfirmPassword}
                   value={confirmPassword}
@@ -171,10 +177,11 @@ export default function LoginScreen() {
           <TouchableOpacity
             className={`bg-white rounded-lg py-2 px-4 mt-8 self-start ${!email ? 'opacity-50' : ''}`}
             onPress={isSignUp ? handleSignUp : login}>
-            <Text className='text-black text-lg font-bold'>{isSignUp ? 'Sign up' : 'Log in'}</Text>
+            <Text className='text-black text-lg font-NotoSansBold'>{isSignUp ? 'Sign up' : 'Log in'}</Text>
           </TouchableOpacity>
         </View>
-      </View>
+        <View className='h-36' />
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

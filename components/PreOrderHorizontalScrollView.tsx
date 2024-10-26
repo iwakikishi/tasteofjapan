@@ -2,9 +2,11 @@ import { Text, ScrollView, TouchableOpacity, View } from 'react-native';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { useCart } from '@/context/CartContext';
 import ReadMore from '@fawazahmed/react-native-read-more';
 import { useQuery } from '@apollo/client';
 import { GET_COLLECTION_BY_ID } from '@/graphql/queries';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface PriceRange {
   minVariantPrice: {
@@ -28,8 +30,19 @@ interface ProductEdge {
   node: Product;
 }
 
-export default function PreOrderHorizontalScrollView({ category, color, pl }: { category: string; color: string; pl: number }) {
+export default function PreOrderHorizontalScrollView({
+  category,
+  color,
+  pl,
+  price,
+}: {
+  category: string;
+  color: string;
+  pl: number;
+  price: boolean;
+}) {
   const router = useRouter();
+  const { tempCart } = useCart();
   const [data, setData] = useState<ProductEdge[]>([]);
 
   const {
@@ -64,24 +77,62 @@ export default function PreOrderHorizontalScrollView({ category, color, pl }: { 
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} className='flex mt-5'>
-      {data?.map((product) => (
-        <TouchableOpacity key={product.node.id} className='w-[240px] h-auto rounded-xl overflow-hidden pl-4' onPress={() => onPressProduct(product)}>
-          {product.node.images && product.node.images.edges[0] && (
-            <View className='flex w-full relative'>
-              <Image source={product.node.images.edges[0].node.url} contentFit='cover' style={{ width: '100%', height: 150, borderRadius: 10 }} />
-              <View className='absolute top-0 right-0 bg-red-500 px-4 py-1 rounded-bl-lg'>
-                <Text className='text-white font-NotoSansBold text-md'>1000 pts</Text>
+      <View className='flex flex-row gap-4 pl-4'>
+        {data?.map((product) => {
+          const quantityOfProduct = tempCart.lineItems.reduce((total, item) => {
+            if (item.productId === product.node.id) {
+              return total + item.quantity;
+            }
+            return total;
+          }, 0);
+          return (
+            <TouchableOpacity
+              key={product.node.id}
+              className={`flex w-[240px] rounded-xl overflow-hidden ${color && 'bg-white'} ${color && 'pb-2'} `}
+              onPress={() => onPressProduct(product)}>
+              {product.node.images && product.node.images.edges[0] && (
+                <View className='flex w-full relative'>
+                  <Image
+                    source={product.node.images.edges[0].node.url}
+                    contentFit='cover'
+                    style={{
+                      width: '100%',
+                      height: 150,
+                      borderRadius: 10,
+                      borderBottomLeftRadius: color ? 0 : 10,
+                      borderBottomRightRadius: color ? 0 : 10,
+                    }}
+                  />
+                  <View className='absolute top-0 right-0 bg-red-500/80 px-4 py-1 rounded-bl-xl'>
+                    <Text className='text-white font-NotoSansBold text-md'>1000 pts</Text>
+                  </View>
+                </View>
+              )}
+              <View className={`flex mt-2 gap-1 ${color && 'px-2'}`}>
+                <Text className={`text-${color ? 'black' : 'white'} text-lg font-NotoSansBold`} numberOfLines={2}>
+                  {product.node.title}
+                </Text>
+                <ReadMore numberOfLines={2} style={{ color: color ? 'black' : 'white', fontFamily: 'NotoSans', fontSize: 13 }}>
+                  {product.node.description}
+                </ReadMore>
+                {price && (
+                  <View className='flex-row justify-between items-baseline mt-2'>
+                    <Text className='text-slate-700 text-lg font-NotoSansBold'>
+                      ${parseFloat(product.node.priceRange.minVariantPrice.amount).toFixed(2)}
+                    </Text>
+                    {quantityOfProduct > 0 && (
+                      <View className={`flex-row px-2 py-0.5 bg-red-600 rounded-full justify-between items-center`}>
+                        <Ionicons name='cart' color='white' size={18} />
+                        <Text className='text-white text-md font-NotoSansBold'> {quantityOfProduct}</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
               </View>
-            </View>
-          )}
-          <View className='flex mt-2 gap-1'>
-            <Text className={`text-${color ? 'black' : 'white'} text-lg font-NotoSansBold`}>{product.node.title}</Text>
-            <ReadMore numberOfLines={2} style={{ color: color ? 'black' : 'white', fontFamily: 'NotoSans', fontSize: 13 }}>
-              {product.node.description}
-            </ReadMore>
-          </View>
-        </TouchableOpacity>
-      ))}
+            </TouchableOpacity>
+          );
+        })}
+      </View>
     </ScrollView>
   );
 }

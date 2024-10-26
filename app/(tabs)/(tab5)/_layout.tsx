@@ -3,10 +3,16 @@ import { Stack } from 'expo-router';
 import { HeaderRight } from '@/components/HeaderRight';
 import { HeaderLeft } from '@/components/HeaderLeft';
 import { useTheme } from '@/context/ThemeContext';
-import { Image } from 'expo-image';
+import { Text } from 'react-native';
 
 export default function AccountLayout() {
   const { colors } = useTheme();
+
+  const HeaderTitle = ({ title }: { title: string }) => (
+    <Text className='text-lg font-NotoSansBold' style={{ color: colors.headerText }}>
+      {title}
+    </Text>
+  );
 
   return (
     <Stack
@@ -19,13 +25,13 @@ export default function AccountLayout() {
         options={{
           headerStyle: { backgroundColor: colors.headerBackground },
           headerShown: true,
-          headerTitle: 'Account',
+          headerTitle: () => <HeaderTitle title='Account' />,
           headerTitleAlign: 'left',
           headerTitleStyle: {
             color: colors.headerText,
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: 'bold',
-            fontFamily: 'NotoSerifJP-Bold',
+            fontFamily: 'NotoSans-Bold',
           },
           headerRight: () => <HeaderRight />,
           headerLeft: () => <HeaderLeft />,

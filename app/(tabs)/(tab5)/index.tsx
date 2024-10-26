@@ -42,25 +42,20 @@ export default function AccountScreen() {
   if (!user) {
     return (
       <SafeAreaView className='flex' style={{ backgroundColor: colors.background }}>
-        <View className='flex-col h-full' style={{ backgroundColor: colors.background }}>
-          <Image
-            source={{
-              uri: 'https://cdn.shopify.com/s/files/1/0663/3209/8735/files/TOJ_banner_mobile.jpg?v=1726212548',
-            }}
-            contentFit='contain'
-            style={{ width: deviceWidth, height: deviceWidth * 0.56 }}
-          />
-          <View className='flex gap-2'>
-            <View className='flex-col p-6' style={{ backgroundColor: 'red' }}>
-              <Text className='text-3xl text-white font-NotoSansBold'>Thank you for your interest in Taste of Japan!</Text>
+        <View className='flex-col h-full justify-center items-center ' style={{ backgroundColor: colors.background }}>
+          <View className='flex justify-center items-center gap-2 -mt-10'>
+            <View className='flex justify-center items-center'>
+              <LottieView source={require('@/assets/lottie/point_card_animation.json')} autoPlay loop style={{ width: 100, height: 100 }} />
             </View>
-            <View className='flex-col mt-8 gap-2 px-6'>
-              <Text className='text-3xl text-white font-DMSansItalic'>Please create an account</Text>
-              <Text className='text-3xl text-white font-DMSansItalic'>or</Text>
-              <Text className='text-3xl text-white font-DMSansItalic'>login to continue</Text>
+            <View className='flex-col items-center mt-4 gap-1 px-6'>
+              <Text className='text-xl text-white font-NotoSansBold'>Please create an account</Text>
+              <Text className='text-xl text-white font-NotoSansBold'>or</Text>
+              <Text className='text-xl text-white font-NotoSansBold'>login to continue</Text>
+            </View>
+            <View className='flex items-center'>
               <Link href='/login' asChild>
                 <TouchableHighlight className='bg-white py-2 px-4 rounded-md mt-10 self-start'>
-                  <Text className='text-xl text-black font-NotoSansBold'>Next</Text>
+                  <Text className='text-xl text-black font-NotoSansBold'>Start</Text>
                 </TouchableHighlight>
               </Link>
             </View>

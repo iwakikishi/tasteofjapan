@@ -2,6 +2,7 @@ import { Stack } from 'expo-router';
 import { useTheme } from '@/context/ThemeContext';
 import { HeaderRight } from '@/components/HeaderRight';
 import { HeaderLeft } from '@/components/HeaderLeft';
+import { HeaderTitle } from '@/components/HeaderTitle';
 
 export default function StageLayout() {
   const { colors } = useTheme();
@@ -12,14 +13,8 @@ export default function StageLayout() {
         options={{
           headerStyle: { backgroundColor: colors.headerBackground },
           headerShown: true,
-          headerTitle: 'Tresure Hunt',
+          headerTitle: () => <HeaderTitle title='Tresure Hunt' />,
           headerTitleAlign: 'left',
-          headerTitleStyle: {
-            color: colors.headerText,
-            fontSize: 20,
-            fontWeight: 'bold',
-            fontFamily: 'NotoSerifJP-Bold',
-          },
           headerRight: () => <HeaderRight />,
           headerLeft: () => <HeaderLeft />,
         }}

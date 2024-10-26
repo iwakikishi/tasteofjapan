@@ -1,7 +1,9 @@
 import { Stack } from 'expo-router';
 import { HeaderLeft } from '@/components/HeaderLeft';
 import { HeaderRight } from '@/components/HeaderRight';
+import { HeaderTitle } from '@/components/HeaderTitle';
 import { useTheme } from '@/context/ThemeContext';
+
 export default function OrdersLayout() {
   const { colors } = useTheme();
   return (
@@ -11,14 +13,8 @@ export default function OrdersLayout() {
         options={{
           headerStyle: { backgroundColor: colors.headerBackground },
           headerShown: true,
-          headerTitle: '',
+          headerTitle: () => <HeaderTitle title='Orders' />,
           headerTitleAlign: 'left',
-          headerTitleStyle: {
-            color: colors.headerText,
-            fontSize: 20,
-            fontWeight: 'bold',
-            fontFamily: 'NotoSerifJP-Bold',
-          },
           headerRight: () => <HeaderRight />,
           headerLeft: () => <HeaderLeft />,
         }}
